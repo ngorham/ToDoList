@@ -2,16 +2,16 @@ package net.ngorham.todolist;
 
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
 
 /**
- * A simple {@link Fragment} subclass.
+ * A simple {@link ListFragment} subclass.
  */
-public class TopFragment extends Fragment {
+public class TopFragment extends ListFragment {
 
 
     public TopFragment() {
@@ -22,9 +22,12 @@ public class TopFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        TextView textView = new TextView(getActivity());
-        textView.setText(R.string.hello_blank_fragment);
-        return textView;
+        //Dummy list for testing
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(inflater.getContext(),
+                android.R.layout.simple_list_item_1,
+                getResources().getStringArray(R.array.top_frag));
+        setListAdapter(adapter);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
 }
