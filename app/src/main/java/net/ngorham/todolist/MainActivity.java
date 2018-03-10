@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -15,7 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity  implements TopFragment.TopListener {
     //Private variables
     private String[] drawerTitles;
     private ListView drawerList;
@@ -171,6 +172,7 @@ public class MainActivity extends Activity {
         //close drawer
         drawerLayout.closeDrawer(drawerList);
     }
+
     //Set title in action bar
     private void setActionBarTitle(int pos){
         String title;
@@ -180,5 +182,13 @@ public class MainActivity extends Activity {
             title = drawerTitles[pos];
         }
         getActionBar().setTitle(title);
+    }
+
+    //Called when an item in TopFragment is clicked
+    @Override
+    public void itemClicked(long id){
+        Intent intent = new Intent(this, ListDetailActivity.class);
+        intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, (int)id);
+        startActivity(intent);
     }
 }
