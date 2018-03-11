@@ -22,6 +22,9 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
     private ListView drawerList;
     private DrawerLayout drawerLayout;
     private int drawerPos = 0;
+    private int listId = 0;
+    private int curMenu = 0;
+    private String actionBarTitle;
     private ActionBarDrawerToggle drawerToggle;
 
     //Private classes
@@ -37,7 +40,7 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Get drawer titles
-        drawerTitles = getResources().getStringArray(R.array.drawer_titles);
+        drawerTitles = getResources().getStringArray(R.array.drawer_titles); //replace with db query
         //Get drawer list view
         drawerList = (ListView) findViewById(R.id.drawer);
         //Get drawer layout
@@ -45,8 +48,12 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
         //Display correct fragment on config changed
         if (savedInstanceState != null) {
             drawerPos = savedInstanceState.getInt("drawerPosition");
-            setActionBarTitle(drawerPos);
+            actionBarTitle = savedInstanceState.getString("actionBarTitle");
+            curMenu = savedInstanceState.getInt("curMenu");
+            setActionBarTitle(actionBarTitle);
         } else {
+            //Set Action bar title
+            actionBarTitle = getResources().getString(R.string.app_name);
             selectItem(0);
         }
         //Populate ListView of DrawerLayout
@@ -60,12 +67,12 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
             //Call when drawer in closed state
             public void onDrawerClosed(View view){
                 super.onDrawerClosed(view);
-                invalidateOptionsMenu();
+                //invalidateOptionsMenu();
             }
             //Call when drawer in open state
             public void onDrawerOpened(View view){
                 super.onDrawerOpened(view);
-                invalidateOptionsMenu();
+                //invalidateOptionsMenu();
             }
         };
         drawerLayout.setDrawerListener(drawerToggle);
@@ -78,20 +85,18 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
                         FragmentManager fragMan = getFragmentManager();
                         Fragment frag = fragMan.findFragmentByTag("visible_frag");
                         if(frag instanceof TopFragment){
-                            drawerPos = 0;
+                            curMenu = 0;
+                            actionBarTitle = getResources().getString(R.string.app_name);
                         }
-                        setActionBarTitle(drawerPos);
+                        if(frag instanceof  ListDetailFragment){
+                            curMenu = 1;
+                        }
+                        invalidateOptionsMenu();
+                        setActionBarTitle(actionBarTitle);
                         drawerList.setItemChecked(drawerPos, true);
                     }
                 }
         );
-        //Update FrameLayout
-        /*TopFragment topFrag = new TopFragment();
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.content_frame, topFrag);
-        ft.addToBackStack(null);
-        ft.setTransition(FragmentTransaction.TRANSIT_NONE);
-        ft.commit();*/
     }
 
     @Override
@@ -104,6 +109,8 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
     public void onSaveInstanceState(Bundle outState){
         super.onSaveInstanceState(outState);
         outState.putInt("drawerPosition", drawerPos);
+        outState.putString("actionBarTitle", actionBarTitle);
+        outState.putInt("curMenu", curMenu);
     }
 
     @Override
@@ -116,10 +123,9 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         //Inflate menu, add items to action bar
-        if(drawerPos == 0){
-            getMenuInflater().inflate(R.menu.menu_main, menu);
-        } else {
-            getMenuInflater().inflate(R.menu.menu_list, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        if(curMenu == 0){ //TopFragment
+            menu.findItem(R.id.edit_list).setVisible(false);
         }
         //getMenuInflater().inflate(R.menu.menu_list, menu);
         return super.onCreateOptionsMenu(menu);
@@ -147,9 +153,13 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
     //Called when invalidateOptionsMenu() is called
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
-        boolean drawerOpen = drawerLayout.isDrawerOpen(drawerList);
-        menu.findItem(R.id.add_list).setVisible(!drawerOpen);
-        //menu.findItem(R.id.app_settings).setVisible(!drawerOpen);
+        if(curMenu == 0){
+            menu.findItem(R.id.add_list).setVisible(true);
+            menu.findItem(R.id.edit_list).setVisible(false);
+        } else if(curMenu == 1){
+            menu.findItem(R.id.add_list).setVisible(false);
+            menu.findItem(R.id.edit_list).setVisible(true);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -168,27 +178,40 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         ft.commit();
         //Show title in action bar
-        setActionBarTitle(pos);
+        setActionBarTitle(actionBarTitle);
         //close drawer
         drawerLayout.closeDrawer(drawerList);
     }
 
     //Set title in action bar
-    private void setActionBarTitle(int pos){
-        String title;
-        if(pos == 0){
-            title = getResources().getString(R.string.app_name);
-        } else {
-            title = drawerTitles[pos];
-        }
+    private void setActionBarTitle(String title){
         getActionBar().setTitle(title);
     }
 
     //Called when an item in TopFragment is clicked
     @Override
     public void itemClicked(long id){
+        listId = (int)id;
+        //Replace current fragment with ListDetailFragment
+        ListDetailFragment frag = new ListDetailFragment();
+        frag.setListId(id);
+        //Update FrameLayout
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.content_frame, frag, "visible_frag");
+        ft.addToBackStack(null);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.commit();
+        //Update title in action bar
+        String[] lists = getResources().getStringArray(R.array.top_frag); //replace with db query
+        actionBarTitle = lists[listId];
+        setActionBarTitle(actionBarTitle);
+        //Update action bar items
+        curMenu = 1;
+        invalidateOptionsMenu();
+        /*
         Intent intent = new Intent(this, ListDetailActivity.class);
         intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, (int)id);
         startActivity(intent);
+        */
     }
 }
