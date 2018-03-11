@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -54,6 +55,7 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
         } else {
             //Set Action bar title
             actionBarTitle = getResources().getString(R.string.app_name);
+            //Update FrameLayout
             selectItem(0);
         }
         //Populate ListView of DrawerLayout
@@ -190,11 +192,13 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
 
     //Called when an item in TopFragment is clicked
     @Override
-    public void itemClicked(long id){
+    public void itemClicked(ListView listView, int pos, long id){
         listId = (int)id;
         //Replace current fragment with ListDetailFragment
         ListDetailFragment frag = new ListDetailFragment();
         frag.setListId(id);
+        Cursor cursor = (Cursor)listView.getItemAtPosition(pos);
+        actionBarTitle = cursor.getString(1);
         //Update FrameLayout
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame, frag, "visible_frag");
@@ -202,8 +206,7 @@ public class MainActivity extends Activity  implements TopFragment.TopListener {
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         ft.commit();
         //Update title in action bar
-        String[] lists = getResources().getStringArray(R.array.top_frag); //replace with db query
-        actionBarTitle = lists[listId];
+        //String[] lists = getResources().getStringArray(R.array.top_frag); //replace with db query
         setActionBarTitle(actionBarTitle);
         //Update action bar items
         curMenu = 1;
