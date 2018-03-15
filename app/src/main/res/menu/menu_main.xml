@@ -10,15 +10,8 @@
         android:orderInCategory="1"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/edit_list"
-        android:title="@string/edit_list"
-
-        android:orderInCategory="2"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/app_settings"
         android:title="@string/app_settings"
         android:orderInCategory="100"
         app:showAsAction="never" />
-
 </menu>
