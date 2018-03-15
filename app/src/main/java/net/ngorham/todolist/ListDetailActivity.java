@@ -17,7 +17,9 @@ public class ListDetailActivity extends Activity {
         ListDetailFragment frag = (ListDetailFragment)
                 getFragmentManager().findFragmentById(R.id.content_frame);
         int listId = (int)getIntent().getExtras().get(EXTRA_LIST_ID);
+        String listName = (String)getIntent().getStringExtra("NAME");
         frag.setListId(listId);
+        frag.setListName(listName);
         /*Fragment frag;
         frag = new ListDetailFragment();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
