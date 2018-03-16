@@ -25,26 +25,36 @@ public class MainActivity extends Activity {
     private RecyclerView todoRecycler;
     private ToDoListAdapter todoAdapter;
     private RecyclerView.LayoutManager todoLayoutManager;
+    //Db variables
+    private ToDoListDAO dao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Set up DAO
+        dao = new ToDoListDAO(this);
         //Set up recycler view
         todoRecycler = (RecyclerView)findViewById(R.id.todo_recycler);
         //Set up Layout Manager
         todoLayoutManager = new LinearLayoutManager(this);
         todoRecycler.setLayoutManager(todoLayoutManager);
+        //Db call and close
+        final List<Note> notes = dao.fetchAllNotes();
+        dao.close();
         //Set up Adapter
-        todoAdapter = new ToDoListAdapter(todos);
+        todoAdapter = new ToDoListAdapter(notes);
         todoRecycler.setAdapter(todoAdapter);
         //Set up on click listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
             public void onClick(int position){
+                int id = notes.get(position).getId();
+                String name = notes.get(position).getName();
                 //Start activity of list clicked
                 Intent intent = new Intent(getApplicationContext(), ListDetailActivity.class);
-                intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, position);
+                intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, id);
+                intent.putExtra("NAME", name);
                 startActivity(intent);
             }
         });

@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Created by NBG on 3/14/2018.
  *
@@ -16,6 +18,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
     //Private variables
     private String[] todos;
     private Listener listener;
+    private List<Note> notes;
 
     public interface Listener { void onClick(int position); }
 
@@ -28,6 +31,11 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
             super(view); //call super constructor
             cardView = view;
         }
+    }
+
+    //Constructor with List parameter
+    public ToDoListAdapter(List<Note> notes){
+        this.notes = notes;
     }
 
     //Constructor
@@ -53,7 +61,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, final int position){
         CardView cardView = holder.cardView;
         TextView textView = (TextView)cardView.findViewById(R.id.info_text);
-        textView.setText(todos[position]);
+        textView.setText(notes.get(position).getName());
         //Set onClickListener to adapter
         cardView.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -71,6 +79,6 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
     @Override
     public int getItemCount(){
         //Return number of items in the data set
-        return todos.length;
+        return notes.size();
     }
 }

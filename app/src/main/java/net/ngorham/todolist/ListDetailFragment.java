@@ -15,6 +15,7 @@ import android.widget.TextView;
 public class ListDetailFragment extends Fragment {
     //Private variables
     private long listId;
+    private String listName;
 
     public ListDetailFragment() {
         // Required empty public constructor
@@ -38,7 +39,9 @@ public class ListDetailFragment extends Fragment {
         if(view != null){
             TextView test = view.findViewById(R.id.test_view);
             String test_id = "list id: " + Long.toString(listId);
-            test.setText(test_id);
+            String test_name = "\nname: " + listName;
+            String text = test_id + test_name;
+            test.setText(text);
         }
     }
 
@@ -51,4 +54,5 @@ public class ListDetailFragment extends Fragment {
     public void setListId(long id){
         this.listId = id;
     }
+    public void setListName(String name){ this.listName = name; }
 }
