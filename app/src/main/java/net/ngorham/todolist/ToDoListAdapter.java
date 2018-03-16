@@ -16,9 +16,11 @@ import java.util.List;
 
 public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHolder> {
     //Private variables
-    private String[] todos;
     private Listener listener;
-    private List<Note> notes;
+    private List<Object> items;
+    //Private constants
+    private final int NOTE_TYPE = 0;
+    private final int ITEM_TYPE = 1;
 
     public interface Listener { void onClick(int position); }
 
@@ -27,32 +29,48 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder {
         //Define holder
         private CardView cardView;
-        public ViewHolder(CardView view){
-            super(view); //call super constructor
-            cardView = view;
+        public ViewHolder(CardView v){
+            super(v);
+            cardView = v;
         }
     }
 
-    //Constructor with List parameter
-    public ToDoListAdapter(List<Note> notes){
-        this.notes = notes;
-    }
+    /*
+    //Provide a reference to the item view used in recycler view
+    private static class ItemViewHolder extends  RecyclerView.ViewHolder {
+        //Define holder
+        private View view;
+        public ItemViewHolder(View v){
+            super(v);
+            view = v;
+        }
+    }*/
 
-    //Constructor
-    public ToDoListAdapter(String[] todos){
-        this.todos = todos;
+    //Constructor with List parameter
+    public ToDoListAdapter(List<Object> items){
+        this.items = items;
     }
 
     public void setListener(Listener listener){
         this.listener = listener;
     }
 
+    @Override
+    public int getItemViewType(int position){
+        if(items.get(position) instanceof  Note){
+            return NOTE_TYPE;
+        } else if(items.get(position) instanceof Item){
+            return ITEM_TYPE;
+        }
+        return -1;
+    }
+
     //Create viewHolder
     @Override
     public ToDoListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
-        //Create new view
-        CardView cv = (CardView)LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.card_todo, parent, false);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        CardView cv = (CardView)inflater.inflate(R.layout.card_todo,
+                parent, false);
         return new ViewHolder(cv);
     }
 
@@ -61,7 +79,8 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, final int position){
         CardView cardView = holder.cardView;
         TextView textView = (TextView)cardView.findViewById(R.id.info_text);
-        textView.setText(notes.get(position).getName());
+        Note note = (Note)items.get(position);
+        textView.setText(note.getName());
         //Set onClickListener to adapter
         cardView.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -79,6 +98,6 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
     @Override
     public int getItemCount(){
         //Return number of items in the data set
-        return notes.size();
+        return items.size();
     }
 }
