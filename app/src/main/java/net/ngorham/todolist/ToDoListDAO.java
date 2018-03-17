@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteException;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -112,8 +113,8 @@ public class ToDoListDAO {
     }
 
     //Get all Notes from db
-    public List<Note> fetchAllNotes(){
-        List<Note> notes = new ArrayList<Note>();
+    public List<Object> fetchAllNotes(){
+        List<Object> notes = new ArrayList<>();
         try{
             Cursor cursor = db.rawQuery("SELECT * FROM NOTE", null);
             if(cursor.moveToFirst()){
@@ -127,6 +128,36 @@ public class ToDoListDAO {
                 cursor.close();
             }
             return notes;
+        } catch (SQLiteException e){
+            Toast.makeText(context,
+                    "Database unavailable, failed to fetch all items from table",
+                    Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
+
+    //Get all Items from db where listId matches
+    public List<Object> fetchAllItems(int listId){
+        List<Object> items = new ArrayList<>();
+        try{
+            String[] selectionArgs = new String[] {String.valueOf(listId)};
+            Cursor cursor = db.query("ITEM",null,
+                    "LIST_ID = ?", selectionArgs,
+                    null, null, "_id");
+            if(cursor.moveToFirst()) {
+                while(!cursor.isAfterLast()){
+                    int id = cursor.getInt(0);
+                    String name = cursor.getString(1);
+                    int noteId = cursor.getInt(2);
+                    Date createdOn = new Date(cursor.getLong(3) * 1000);
+                    Date lastModified = new Date(cursor.getLong(4) * 1000);
+                    Item item = new Item(id, name, createdOn, lastModified, noteId);
+                    items.add(item);
+                    cursor.moveToNext();
+                }
+                cursor.close();
+            }
+            return items;
         } catch (SQLiteException e){
             Toast.makeText(context,
                     "Database unavailable, failed to fetch all items from table",

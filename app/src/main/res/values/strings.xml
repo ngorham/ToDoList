@@ -3,22 +3,12 @@
     <string name="app_settings">Settings</string>
     <string name="add_list">Add List</string>
     <string name="edit_list">Edit List</string>
+    <string name="delete_list">Delete List</string>
     <!-- Top fragment -->
     <string-array name="top_frag">
         <item>Test List 1</item>
         <item>Test List 2</item>
         <item>Test List 3</item>
     </string-array>
-    <!-- DrawerLayout -->
-    <string name="open_drawer">Open drawer</string>
-    <string name="close_drawer">Close drawer</string>
-    <!-- drawer list -->
-    <string-array name="drawer_titles">
-        <item>Home</item>
-        <item>Drawer Option 1</item>
-        <item>Drawer Option 2</item>
-        <item>Drawer Option 3</item>
-    </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

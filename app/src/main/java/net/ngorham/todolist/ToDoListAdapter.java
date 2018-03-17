@@ -1,11 +1,9 @@
 package net.ngorham.todolist;
 
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.List;
 
@@ -14,7 +12,7 @@ import java.util.List;
  *
  */
 
-public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHolder> {
+public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     //Private variables
     private Listener listener;
     private List<Object> items;
@@ -24,37 +22,51 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
 
     public interface Listener { void onClick(int position); }
 
-    //Inner classes
-    //Provide a reference to the views used in recycler view
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        //Define holder
-        private CardView cardView;
-        public ViewHolder(CardView v){
-            super(v);
-            cardView = v;
-        }
-    }
-
-    /*
-    //Provide a reference to the item view used in recycler view
-    private static class ItemViewHolder extends  RecyclerView.ViewHolder {
-        //Define holder
-        private View view;
-        public ItemViewHolder(View v){
-            super(v);
-            view = v;
-        }
-    }*/
-
     //Constructor with List parameter
     public ToDoListAdapter(List<Object> items){
         this.items = items;
     }
 
+    //Set onClick listener
     public void setListener(Listener listener){
         this.listener = listener;
     }
 
+    //Configure Note type item
+    private void configureNote(NoteViewHolder holder, final int position){
+        Note note = (Note)items.get(position);
+        if(note != null){
+            holder.getNameLabel().setText(note.getName());
+        }
+        holder.getNameLabel().setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                //If view is clicked, call onClick
+                if(listener != null){
+                    listener.onClick(position);
+                }
+            }
+        });
+    }
+
+    //Configure Item type item
+    private void configureItem(ItemViewHolder holder, final int position){
+        Item item = (Item)items.get(position);
+        if(item != null){
+            holder.getNameLabel().setText(item.getName());
+        }
+        holder.getNameLabel().setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                //If view is clicked, call onClick
+                if(listener != null){
+                    listener.onClick(position);
+                }
+            }
+        });
+    }
+
+    //Return the item view type
     @Override
     public int getItemViewType(int position){
         if(items.get(position) instanceof  Note){
@@ -67,31 +79,33 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ViewHo
 
     //Create viewHolder
     @Override
-    public ToDoListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        CardView cv = (CardView)inflater.inflate(R.layout.card_todo,
-                parent, false);
-        return new ViewHolder(cv);
+        if(viewType == NOTE_TYPE){
+            View cv = inflater.inflate(R.layout.card_todo,
+                    parent, false);
+            return new NoteViewHolder(cv);
+        } else if(viewType == ITEM_TYPE){
+            View v = inflater.inflate(R.layout.card_todo,
+                    parent, false);
+            return new ItemViewHolder(v);
+        }
+        return null;
     }
 
     //Set data inside viewHolder
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position){
-        CardView cardView = holder.cardView;
-        TextView textView = (TextView)cardView.findViewById(R.id.info_text);
-        Note note = (Note)items.get(position);
-        textView.setText(note.getName());
-        //Set onClickListener to adapter
-        cardView.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-
-                //If view is clicked, call onClick
-                if(listener != null){
-                    listener.onClick(position);
-                }
-            }
-        });
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position){
+        switch(holder.getItemViewType()){
+            case NOTE_TYPE:
+                NoteViewHolder nvh = (NoteViewHolder)holder;
+                configureNote(nvh, position);
+                break;
+            case ITEM_TYPE:
+                ItemViewHolder ivh = (ItemViewHolder)holder;
+                configureItem(ivh, position);
+                break;
+        }
     }
 
     //Return number of items in the data set

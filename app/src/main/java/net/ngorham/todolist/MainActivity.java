@@ -40,17 +40,18 @@ public class MainActivity extends Activity {
         todoLayoutManager = new LinearLayoutManager(this);
         todoRecycler.setLayoutManager(todoLayoutManager);
         //Db call and close
-        final List<Note> notes = dao.fetchAllNotes();
+        final List<Object> notes = dao.fetchAllNotes();
         dao.close();
         //Set up Adapter
         todoAdapter = new ToDoListAdapter(notes);
         todoRecycler.setAdapter(todoAdapter);
-        //Set up on click listener
+        //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
             public void onClick(int position){
-                int id = notes.get(position).getId();
-                String name = notes.get(position).getName();
+                Note note = (Note)notes.get(position);
+                int id = note.getId();
+                String name = note.getName();
                 //Start activity of list clicked
                 Intent intent = new Intent(getApplicationContext(), ListDetailActivity.class);
                 intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, id);
