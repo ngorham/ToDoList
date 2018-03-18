@@ -38,6 +38,8 @@ public class ListDetailActivity extends Activity {
         listName = getIntent().getStringExtra("NAME");
         //Set ActionBar title
         if(listName != null) { getActionBar().setTitle(listName); }
+        //Enable the up button in ActionBar
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         //Set up DAO
         dao = new ToDoListDAO(this);
         //Set up recycler view

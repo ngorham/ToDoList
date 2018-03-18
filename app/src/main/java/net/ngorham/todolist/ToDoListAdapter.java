@@ -5,7 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by NBG on 3/14/2018.
@@ -54,6 +56,10 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         Item item = (Item)items.get(position);
         if(item != null){
             holder.getNameLabel().setText(item.getName());
+            SimpleDateFormat dateFormat =
+                    new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            String lastModifiedDate = dateFormat.format(item.getLastModified());
+            holder.getLastModifiedLabel().setText(lastModifiedDate);
         }
         holder.getNameLabel().setOnClickListener(new View.OnClickListener(){
             @Override
@@ -82,11 +88,11 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if(viewType == NOTE_TYPE){
-            View cv = inflater.inflate(R.layout.card_todo,
+            View cv = inflater.inflate(R.layout.note_view,
                     parent, false);
             return new NoteViewHolder(cv);
         } else if(viewType == ITEM_TYPE){
-            View v = inflater.inflate(R.layout.card_todo,
+            View v = inflater.inflate(R.layout.item_view,
                     parent, false);
             return new ItemViewHolder(v);
         }

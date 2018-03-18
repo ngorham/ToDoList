@@ -11,15 +11,20 @@ import android.widget.TextView;
 public class ItemViewHolder extends RecyclerView.ViewHolder {
     //Private variables
     private TextView nameLabel;
+    private TextView lastModifiedLabel;
 
     //Constructor
     public ItemViewHolder(View v){
         super(v);
-        this.nameLabel = v.findViewById(R.id.info_text);
+        this.nameLabel = v.findViewById(R.id.name_text);
+        this.lastModifiedLabel = v.findViewById(R.id.last_modified_text);
     }
 
     //Return reference of TextView nameLabel
     public TextView getNameLabel(){ return nameLabel; }
+
+    //Return reference of TextView lastModifiedLabel
+    public TextView getLastModifiedLabel(){ return lastModifiedLabel; }
 
     //Set reference of TextView nameLabel
     public void setNameLabel(TextView nameLabel){
