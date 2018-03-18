@@ -8,16 +8,17 @@
         android:title="@string/edit_list"
         android:icon="@drawable/ic_edit_black_18dp"
         android:orderInCategory="1"
-        app:showAsAction="always" />
+        android:showAsAction="ifRoom" />
     <item
         android:id="@+id/delete_list"
         android:title="@string/delete_list"
         android:icon="@drawable/ic_delete_black_18dp"
         android:orderInCategory="2"
-        app:showAsAction="ifRoom"/>
+        android:showAsAction="ifRoom"/>
     <item
         android:id="@+id/app_settings"
         android:title="@string/app_settings"
+        android:icon="@drawable/ic_settings_black_18dp"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:showAsAction="never|withText" />
 </menu>

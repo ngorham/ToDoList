@@ -5,15 +5,20 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class MainActivity extends Activity {
@@ -82,6 +87,23 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu){
         //Inflate menu, add items to action bar
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        //Display icons and text in overflow menu
+        //code found on stackoverflow
+        //https://stackoverflow.com/questions/18374183/how-to-show-icons-in-overflow-menu-in-actionbar
+        if(menu.getClass().getSimpleName().equals("MenuBuilder")){
+            try{
+                Method m = menu.getClass().getDeclaredMethod(
+                        "setOptionalIconsVisible", Boolean.TYPE);
+                m.setAccessible(true);
+                m.invoke(menu, true);
+            }
+            catch(NoSuchMethodException e){
+                Log.e("onCreateOptionsMenu", "Did not attach icons", e);
+            }
+            catch(Exception e){
+                throw new RuntimeException(e);
+            }
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -92,9 +114,11 @@ public class MainActivity extends Activity {
         switch(item.getItemId()){
             case R.id.add_list:
                 //Add list action
+                Toast.makeText(this, "Add list action", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.app_settings:
                 //Settings action
+                Toast.makeText(this, "Settings action", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
