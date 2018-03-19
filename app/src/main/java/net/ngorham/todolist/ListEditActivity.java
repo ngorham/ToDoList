@@ -1,11 +1,11 @@
 package net.ngorham.todolist;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,9 +14,10 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
-public class ListDetailActivity extends Activity {
+public class ListEditActivity extends Activity {
     //Public constants
     public static final String EXTRA_LIST_ID = "id";
 
@@ -33,42 +34,45 @@ public class ListDetailActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_detail);
-        //Store data received from intent
-        listId = (int)getIntent().getExtras().get(EXTRA_LIST_ID);
-        if(listId > 0) {
-            listName = getIntent().getStringExtra("NAME");
-        } else {
-            listName = "";
-        }
-        //Set ActionBar title
-        getActionBar().setTitle(listName);
+        setContentView(R.layout.activity_list_edit);
         //Set up recycler view
         todoRecycler = findViewById(R.id.todo_recycler);
         //Set up Layout Manager
         todoLayoutManager = new LinearLayoutManager(this);
         todoRecycler.setLayoutManager(todoLayoutManager);
-        //Set up DAO
-        dao = new ToDoListDAO(this);
-        //DB call and close
-        final List<Object> items = dao.fetchAllItems(listId);
-        dao.close();
-        //Set up Adapter
-        todoAdapter = new ToDoListAdapter(items);
+        //Store data received from intent
+        listId = (int)getIntent().getExtras().get(EXTRA_LIST_ID);
+        if(listId > 0) { //Edit existing list
+            listName = getIntent().getStringExtra("NAME");
+            //Set up DAO
+            dao = new ToDoListDAO(this);
+            //DB call and close
+            final List<Object> items = dao.fetchAllItems(listId);
+            dao.close();
+            //Create Adapter
+            todoAdapter = new ToDoListAdapter(items);
+        } else { //Create new list
+            listName = "";
+            List<Object> empty = new ArrayList<>();
+            todoAdapter = new ToDoListAdapter(empty);
+        }
+        //Set ActionBar title
+        //getActionBar().setTitle(listName);
+        //Set Adapter
         todoRecycler.setAdapter(todoAdapter);
         //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
             public void onClick(int position){
-                //Put slash through text
-                //Update db item  column slash = 1 (true) or 0 (false)
-                //AsyncTask
+
             }
         });
         //Add divider item decoration
         Drawable divider = ContextCompat.getDrawable(this, R.drawable.divider);
         RecyclerView.ItemDecoration dividerItemDecoration = new ToDoListDivider(divider);
         todoRecycler.addItemDecoration(dividerItemDecoration);
+        getActionBar().setCustomView(R.layout.text_field);
+        getActionBar().setDisplayOptions(getActionBar().DISPLAY_SHOW_CUSTOM);
     }
 
     @Override
@@ -90,7 +94,7 @@ public class ListDetailActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         //Inflate menu, add items to action bar
-        getMenuInflater().inflate(R.menu.menu_list_detail, menu);
+        getMenuInflater().inflate(R.menu.menu_list_edit, menu);
         //Display icons and text in overflow menu
         //code found on stackoverflow
         //https://stackoverflow.com/questions/18374183/how-to-show-icons-in-overflow-menu-in-actionbar
@@ -116,16 +120,8 @@ public class ListDetailActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item){
         //Handle action items
         switch(item.getItemId()){
-            case R.id.edit_list:
-                //Edit list action
-                Toast.makeText(this, "Edit list action", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, ListEditActivity.class);
-                intent.putExtra(ListEditActivity.EXTRA_LIST_ID, listId);
-                intent.putExtra("NAME", listName);
-                startActivity(intent);
-                return true;
             case R.id.delete_list:
-                //Delete list action
+                //Add list action
                 Toast.makeText(this, "Delete list action", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.app_settings:
@@ -135,5 +131,11 @@ public class ListDetailActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    //Called when invalidateOptionsMenu() is called
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        return super.onPrepareOptionsMenu(menu);
     }
 }

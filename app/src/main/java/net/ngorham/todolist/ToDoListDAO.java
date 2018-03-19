@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -162,7 +163,7 @@ public class ToDoListDAO {
             Toast.makeText(context,
                     "Database unavailable, failed to fetch all items from table",
                     Toast.LENGTH_SHORT).show();
-            return null;
+            return items;
         }
     }
 }

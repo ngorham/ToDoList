@@ -115,6 +115,10 @@ public class MainActivity extends Activity {
             case R.id.add_list:
                 //Add list action
                 Toast.makeText(this, "Add list action", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, ListEditActivity.class);
+                intent.putExtra(ListEditActivity.EXTRA_LIST_ID, 0);
+                //listId = 0 -> new list with no name
+                startActivity(intent);
                 return true;
             case R.id.app_settings:
                 //Settings action

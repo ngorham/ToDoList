@@ -4,6 +4,7 @@
     <string name="add_list">Add List</string>
     <string name="edit_list">Edit List</string>
     <string name="delete_list">Delete List</string>
+    <string name="text_field">Editable Text</string>
     <!-- Top fragment -->
     <string-array name="top_frag">
         <item>Test List 1</item>
