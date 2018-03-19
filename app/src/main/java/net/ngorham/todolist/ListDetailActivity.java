@@ -34,6 +34,11 @@ public class ListDetailActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_detail);
+        //Set up recycler view
+        todoRecycler = findViewById(R.id.todo_recycler);
+        //Set up Layout Manager
+        todoLayoutManager = new LinearLayoutManager(this);
+        todoRecycler.setLayoutManager(todoLayoutManager);
         //Store data received from intent
         listId = (int)getIntent().getExtras().get(EXTRA_LIST_ID);
         if(listId > 0) {
@@ -43,11 +48,6 @@ public class ListDetailActivity extends Activity {
         }
         //Set ActionBar title
         getActionBar().setTitle(listName);
-        //Set up recycler view
-        todoRecycler = findViewById(R.id.todo_recycler);
-        //Set up Layout Manager
-        todoLayoutManager = new LinearLayoutManager(this);
-        todoRecycler.setLayoutManager(todoLayoutManager);
         //Set up DAO
         dao = new ToDoListDAO(this);
         //DB call and close

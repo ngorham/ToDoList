@@ -21,6 +21,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     //Private constants
     private final int NOTE_TYPE = 0;
     private final int ITEM_TYPE = 1;
+    private final int ADD_ITEM_TYPE = 2;
 
     public interface Listener { void onClick(int position); }
 
@@ -72,6 +73,22 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         });
     }
 
+    //Configure AddItem type item
+    private void configureAddItem(AddItemViewHolder holder, final int position){
+        AddItem item = (AddItem)items.get(position);
+        if(item != null){
+            holder.getTextLabel().setText(item.getText());
+        }
+        holder.getTextLabel().setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if(listener != null) {
+                    listener.onClick(position);
+                }
+            }
+        });
+    }
+
     //Return the item view type
     @Override
     public int getItemViewType(int position){
@@ -79,6 +96,8 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             return NOTE_TYPE;
         } else if(items.get(position) instanceof Item){
             return ITEM_TYPE;
+        } else if(items.get(position) instanceof AddItem){
+            return ADD_ITEM_TYPE;
         }
         return -1;
     }
@@ -87,14 +106,16 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View v;
         if(viewType == NOTE_TYPE){
-            View cv = inflater.inflate(R.layout.note_view,
-                    parent, false);
-            return new NoteViewHolder(cv);
+            v = inflater.inflate(R.layout.note_view, parent, false);
+            return new NoteViewHolder(v);
         } else if(viewType == ITEM_TYPE){
-            View v = inflater.inflate(R.layout.item_view,
-                    parent, false);
+            v = inflater.inflate(R.layout.item_view, parent, false);
             return new ItemViewHolder(v);
+        } else if(viewType == ADD_ITEM_TYPE){
+            v = inflater.inflate(R.layout.add_item_view, parent, false);
+            return new AddItemViewHolder(v);
         }
         return null;
     }
@@ -110,6 +131,10 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case ITEM_TYPE:
                 ItemViewHolder ivh = (ItemViewHolder)holder;
                 configureItem(ivh, position);
+                break;
+            case ADD_ITEM_TYPE:
+                AddItemViewHolder aivh = (AddItemViewHolder)holder;
+                configureAddItem(aivh, position);
                 break;
         }
     }

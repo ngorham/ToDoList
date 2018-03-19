@@ -3,19 +3,12 @@ package net.ngorham.todolist;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
@@ -37,13 +30,13 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Set up DAO
-        dao = new ToDoListDAO(this);
         //Set up recycler view
         todoRecycler = (RecyclerView)findViewById(R.id.todo_recycler);
         //Set up Layout Manager
         todoLayoutManager = new LinearLayoutManager(this);
         todoRecycler.setLayoutManager(todoLayoutManager);
+        //Set up DAO
+        dao = new ToDoListDAO(this);
         //Db call and close
         final List<Object> notes = dao.fetchAllNotes();
         dao.close();

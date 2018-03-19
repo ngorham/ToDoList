@@ -1,16 +1,19 @@
 package net.ngorham.todolist;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
@@ -24,6 +27,7 @@ public class ListEditActivity extends Activity {
     //Private variables
     int listId;
     String listName;
+    private ActionBar actionBar;
     //Recycler View variables
     private RecyclerView todoRecycler;
     private ToDoListAdapter todoAdapter;
@@ -40,6 +44,7 @@ public class ListEditActivity extends Activity {
         //Set up Layout Manager
         todoLayoutManager = new LinearLayoutManager(this);
         todoRecycler.setLayoutManager(todoLayoutManager);
+        final List<Object> items;
         //Store data received from intent
         listId = (int)getIntent().getExtras().get(EXTRA_LIST_ID);
         if(listId > 0) { //Edit existing list
@@ -47,17 +52,17 @@ public class ListEditActivity extends Activity {
             //Set up DAO
             dao = new ToDoListDAO(this);
             //DB call and close
-            final List<Object> items = dao.fetchAllItems(listId);
+            items = dao.fetchAllItems(listId);
             dao.close();
-            //Create Adapter
-            todoAdapter = new ToDoListAdapter(items);
         } else { //Create new list
             listName = "";
-            List<Object> empty = new ArrayList<>();
-            todoAdapter = new ToDoListAdapter(empty);
+            items = new ArrayList<>();
         }
-        //Set ActionBar title
-        //getActionBar().setTitle(listName);
+        //Add AddItem options to top and bottom of recyclerView
+        items.add(0, new AddItem());
+        items.add(items.size(), new AddItem());
+        //Create Adapter
+        todoAdapter = new ToDoListAdapter(items);
         //Set Adapter
         todoRecycler.setAdapter(todoAdapter);
         //Set up onClick listener
@@ -71,8 +76,23 @@ public class ListEditActivity extends Activity {
         Drawable divider = ContextCompat.getDrawable(this, R.drawable.divider);
         RecyclerView.ItemDecoration dividerItemDecoration = new ToDoListDivider(divider);
         todoRecycler.addItemDecoration(dividerItemDecoration);
-        getActionBar().setCustomView(R.layout.text_field);
-        getActionBar().setDisplayOptions(getActionBar().DISPLAY_SHOW_CUSTOM);
+        //Get ActionBar reference
+        actionBar = getActionBar();
+        //Set EditText view in actionBar
+        actionBar.setCustomView(R.layout.text_field);
+        EditText listNameField = (EditText)actionBar.getCustomView()
+                .findViewById(R.id.field);
+        listNameField.setText(listName, TextView.BufferType.EDITABLE);
+        //Set EditText listener
+        listNameField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                Toast.makeText(getApplicationContext(), "EditText action listener called", Toast.LENGTH_LONG).show();
+                //Check for empty string in EditText
+                return false;
+            }
+        });
+        actionBar.setDisplayOptions(getActionBar().DISPLAY_SHOW_CUSTOM);
     }
 
     @Override
