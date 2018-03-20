@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class ToDoListDatabaseHelper extends SQLiteOpenHelper{
     //Private constants
     private static final String DB_NAME = "ToDoList";
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
     //Note Schema
     private final String NOTE_TABLE = "NOTE";
     private final String COLUMN_ID = "_id";
@@ -30,13 +30,15 @@ public class ToDoListDatabaseHelper extends SQLiteOpenHelper{
     private final String COLUMN_LIST_ID = "LIST_ID";
     private final String COLUMN_CREATED_ON = "CREATED_ON";
     private final String COLUMN_LAST_MODIFIED = "LAST_MODIFIED";
+    private final String COLUMN_STRIKE = "STRIKE";
     private final String ITEM_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
             + ITEM_TABLE + " ("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_NAME + " TEXT NOT NULL,"
             + COLUMN_LIST_ID + " INTEGER, "
             + COLUMN_CREATED_ON + " DATETIME DEFAULT CURRENT_TIMESTAMP, "
-            + COLUMN_LAST_MODIFIED + " DATETIME DEFAULT CURRENT_TIMESTAMP"
+            + COLUMN_LAST_MODIFIED + " DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            + COLUMN_STRIKE + " NUMERIC"
             + ");";
 
 

@@ -1,9 +1,12 @@
 package net.ngorham.todolist;
 
+import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -23,7 +26,9 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final int ITEM_TYPE = 1;
     private final int ADD_ITEM_TYPE = 2;
 
-    public interface Listener { void onClick(int position); }
+    public interface Listener {
+        void onClick(View view, int position);
+    }
 
     //Constructor with List parameter
     public ToDoListAdapter(List<Object> items){
@@ -46,7 +51,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             public void onClick(View v){
                 //If view is clicked, call onClick
                 if(listener != null){
-                    listener.onClick(position);
+                    listener.onClick(v, position);
                 }
             }
         });
@@ -57,6 +62,13 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         Item item = (Item)items.get(position);
         if(item != null){
             holder.getNameLabel().setText(item.getName());
+            if(item.getStrike() == 1){
+                holder.getNameLabel().setPaintFlags(
+                        holder.getNameLabel().getPaintFlags()
+                                | Paint.STRIKE_THRU_TEXT_FLAG);
+            } else {
+                holder.getNameLabel().setPaintFlags(0);
+            }
             SimpleDateFormat dateFormat =
                     new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             String lastModifiedDate = dateFormat.format(item.getLastModified());
@@ -67,7 +79,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             public void onClick(View v){
                 //If view is clicked, call onClick
                 if(listener != null){
-                    listener.onClick(position);
+                    listener.onClick(v, position);
                 }
             }
         });
@@ -83,7 +95,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             @Override
             public void onClick(View v){
                 if(listener != null) {
-                    listener.onClick(position);
+                    listener.onClick(v, position);
                 }
             }
         });

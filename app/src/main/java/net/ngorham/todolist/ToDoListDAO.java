@@ -137,6 +137,25 @@ public class ToDoListDAO {
         }
     }
 
+    //Update Item STRIKE column  in db
+    public boolean updateStrike(Item item){
+        //Set content values
+        ContentValues values = new ContentValues();
+        values.put("STRIKE", item.getStrike());
+        //Update ITEM STRIKE where id matches
+        try{
+            int results = db.update("ITEM", values, "_id = ?",
+                    new String[] {String.valueOf(item.getId())});
+            return (results > 0);
+        } catch (SQLiteException e){
+            Toast.makeText(context,
+                    "Database unavailable, failed to update strike in ITEM table",
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+    }
+
     //Get all Items from db where listId matches
     public List<Object> fetchAllItems(int listId){
         List<Object> items = new ArrayList<>();
@@ -152,7 +171,8 @@ public class ToDoListDAO {
                     int noteId = cursor.getInt(2);
                     Date createdOn = new Date(cursor.getLong(3) * 1000);
                     Date lastModified = new Date(cursor.getLong(4) * 1000);
-                    Item item = new Item(id, name, createdOn, lastModified, noteId);
+                    int strike = cursor.getInt(5);
+                    Item item = new Item(id, name, createdOn, lastModified, noteId, strike);
                     items.add(item);
                     cursor.moveToNext();
                 }

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,7 +69,7 @@ public class ListEditActivity extends Activity {
         //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
-            public void onClick(int position){
+            public void onClick(View view, int position){
 
             }
         });

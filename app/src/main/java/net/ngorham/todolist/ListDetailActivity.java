@@ -3,7 +3,9 @@ package net.ngorham.todolist;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +13,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
@@ -29,6 +33,23 @@ public class ListDetailActivity extends Activity {
     private RecyclerView.LayoutManager todoLayoutManager;
     //Db variables
     private ToDoListDAO dao;
+
+    //Inner classes
+    //Update Item strike value
+    private class UpdateItemStrikeTask extends AsyncTask<Item, Void, Boolean>{
+        protected void onPreExecute(){}
+        protected Boolean doInBackground(Item... items){
+            Item item = items[0];
+            return dao.updateStrike(item);
+        }
+        protected void onPostExecute(Boolean success){
+            if(!success){
+                Toast.makeText(ListDetailActivity.this,
+                        "Database unavailable, failed to update strike in ITEM table",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +73,24 @@ public class ListDetailActivity extends Activity {
         dao = new ToDoListDAO(this);
         //DB call and close
         final List<Object> items = dao.fetchAllItems(listId);
-        dao.close();
         //Set up Adapter
         todoAdapter = new ToDoListAdapter(items);
         todoRecycler.setAdapter(todoAdapter);
         //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
-            public void onClick(int position){
-                //Put slash through text
+            public void onClick(View view, int position){
+                TextView textView = (TextView)view;
+                Item item = (Item)items.get(position);
+                if(item.getStrike() == 0){
+                    textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    item.setStrike(1);
+                } else {
+                    //Remove strikethrough
+                    textView.setPaintFlags(0);
+                    item.setStrike(0);
+                }
+                new UpdateItemStrikeTask().execute(item);
                 //Update db item  column slash = 1 (true) or 0 (false)
                 //AsyncTask
             }
@@ -74,6 +104,12 @@ public class ListDetailActivity extends Activity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState){
         super.onPostCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        dao.close();
     }
 
     @Override

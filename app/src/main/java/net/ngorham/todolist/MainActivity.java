@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
@@ -46,7 +47,7 @@ public class MainActivity extends Activity {
         //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
-            public void onClick(int position){
+            public void onClick(View view, int position){
                 Note note = (Note)notes.get(position);
                 int id = note.getId();
                 String name = note.getName();

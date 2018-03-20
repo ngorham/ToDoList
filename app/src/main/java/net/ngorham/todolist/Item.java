@@ -13,18 +13,20 @@ public class Item {
     private String name;
     private Date createdOn;
     private Date lastModified;
+    private int strike = 0;
 
     //Default constructor
     public Item(){
-        this(0,"",null,null,0);
+        this(0,"",null,null,0, 0);
     }
 
-    public Item(int id, String name, Date createdOn, Date lastModified, int noteId){
+    public Item(int id, String name, Date createdOn, Date lastModified, int noteId, int strike){
         setId(id);
         setName(name);
         setCreatedOn(createdOn);
         setLastModified(lastModified);
         setNoteId(noteId);
+        setStrike(strike);
     }
 
     public void setId(int id){
@@ -47,6 +49,10 @@ public class Item {
         this.noteId = noteId;
     }
 
+    public void setStrike(int strike){
+        this.strike = strike;
+    }
+
     public int getId(){ return id; }
 
     public String getName(){ return name; }
@@ -56,4 +62,6 @@ public class Item {
     public Date getLastModified(){ return lastModified; }
 
     public int getNoteId(){ return noteId; }
+
+    public int getStrike(){ return strike; }
 }
