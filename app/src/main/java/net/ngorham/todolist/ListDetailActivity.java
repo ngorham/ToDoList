@@ -62,11 +62,8 @@ public class ListDetailActivity extends Activity {
         todoRecycler.setLayoutManager(todoLayoutManager);
         //Store data received from intent
         listId = (int)getIntent().getExtras().get(EXTRA_LIST_ID);
-        if(listId > 0) {
-            listName = getIntent().getStringExtra("NAME");
-        } else {
-            listName = "";
-        }
+        if(listId > 0) { listName = getIntent().getStringExtra("NAME"); }
+        else { listName = ""; }
         //Set ActionBar title
         getActionBar().setTitle(listName);
         //Set up DAO
@@ -86,13 +83,11 @@ public class ListDetailActivity extends Activity {
                     textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     item.setStrike(1);
                 } else {
-                    //Remove strikethrough
+                    //Remove strike through
                     textView.setPaintFlags(0);
                     item.setStrike(0);
                 }
                 new UpdateItemStrikeTask().execute(item);
-                //Update db item  column slash = 1 (true) or 0 (false)
-                //AsyncTask
             }
         });
         //Add divider item decoration

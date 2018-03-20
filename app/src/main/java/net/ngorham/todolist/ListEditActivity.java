@@ -2,6 +2,8 @@ package net.ngorham.todolist;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -70,7 +72,11 @@ public class ListEditActivity extends Activity {
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
             public void onClick(View view, int position){
-
+                if(items.get(position) instanceof AddItem){
+                    addItemDialog();
+                } else if(items.get(position) instanceof Item){
+                    editItemDialog(((Item) items.get(position)).getName());
+                }
             }
         });
         //Add divider item decoration
@@ -158,5 +164,62 @@ public class ListEditActivity extends Activity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    //Displays Add Item AlertDialog
+    public void addItemDialog(){
+        //AlertDialog alertDialog = null;
+        //Create AlertDialog.Builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListEditActivity.this);
+        builder.setTitle(R.string.add_item);
+        View addItemView = getLayoutInflater().inflate(R.layout.add_item_dialog, null);
+        builder.setView(addItemView);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //add new item to List<Object> items
+                //add item to db
+                //update recycler view
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //cancel, return to activity
+            }
+        });
+        builder.setCancelable(true);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    //Displays Edit Item AlertDialog
+    public void editItemDialog(String itemName){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListEditActivity.this);
+        builder.setTitle(R.string.edit_item);
+        View editItemView = getLayoutInflater().inflate(R.layout.edit_item_dialog, null);
+        builder.setView(editItemView);
+        EditText editItemField = editItemView.findViewById(R.id.edit_item_field);
+        editItemField.setText(itemName, TextView.BufferType.EDITABLE);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Check for item.name and editItemField.text equality
+                //if not equal
+                //update item.name
+                //update item.name in db
+                //update recycler view
+                //if equal do nothing
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //cancel, return to activity
+            }
+        });
+        builder.setCancelable(true);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }
