@@ -21,18 +21,22 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     //Private variables
     private Listener listener;
     private List<Object> items;
+    private int editType = 0;
     //Private constants
     private final int NOTE_TYPE = 0;
     private final int ITEM_TYPE = 1;
-    private final int ADD_ITEM_TYPE = 2;
+    private final int EDIT_ITEM_TYPE = 2;
+    private final int ADD_ITEM_TYPE = 3;
 
     public interface Listener {
         void onClick(View view, int position);
+        void deleteItem(View view, int position);
     }
 
     //Constructor with List parameter
-    public ToDoListAdapter(List<Object> items){
+    public ToDoListAdapter(List<Object> items, int editType){
         this.items = items;
+        this.editType = editType;
     }
 
     //Set onClick listener
@@ -100,6 +104,29 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         });
     }
+    //Configure EditItem type item
+    private void configureEditItem(EditItemViewHolder holder, final int position){
+        Item item = (Item)items.get(position);
+        if(item != null){
+            holder.getNameLabel().setText(item.getName());
+        }
+        holder.getNameLabel().setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if(listener != null) {
+                    listener.onClick(v, position);
+                }
+            }
+        });
+        holder.getDeleteButton().setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if(listener != null){
+                    listener.deleteItem(v, position);
+                }
+            }
+        });
+    }
 
     //Return the item view type
     @Override
@@ -107,7 +134,11 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if(items.get(position) instanceof  Note){
             return NOTE_TYPE;
         } else if(items.get(position) instanceof Item){
-            return ITEM_TYPE;
+            if(editType == 0) {
+                return ITEM_TYPE;
+            } else {
+                return EDIT_ITEM_TYPE;
+            }
         } else if(items.get(position) instanceof AddItem){
             return ADD_ITEM_TYPE;
         }
@@ -128,6 +159,9 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         } else if(viewType == ADD_ITEM_TYPE){
             v = inflater.inflate(R.layout.add_item_view, parent, false);
             return new AddItemViewHolder(v);
+        } else if(viewType == EDIT_ITEM_TYPE){
+            v = inflater.inflate(R.layout.edit_item_view, parent, false);
+            return new EditItemViewHolder(v);
         }
         return null;
     }
@@ -147,6 +181,10 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case ADD_ITEM_TYPE:
                 AddItemViewHolder aivh = (AddItemViewHolder)holder;
                 configureAddItem(aivh, position);
+                break;
+            case EDIT_ITEM_TYPE:
+                EditItemViewHolder eivh = (EditItemViewHolder)holder;
+                configureEditItem(eivh, position);
                 break;
         }
     }

@@ -71,7 +71,7 @@ public class ListDetailActivity extends Activity {
         //DB call and close
         final List<Object> items = dao.fetchAllItems(listId);
         //Set up Adapter
-        todoAdapter = new ToDoListAdapter(items);
+        todoAdapter = new ToDoListAdapter(items, 0);
         todoRecycler.setAdapter(todoAdapter);
         //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
@@ -89,6 +89,8 @@ public class ListDetailActivity extends Activity {
                 }
                 new UpdateItemStrikeTask().execute(item);
             }
+            @Override
+            public void deleteItem(View v, int position){}
         });
         //Add divider item decoration
         Drawable divider = ContextCompat.getDrawable(this, R.drawable.divider);

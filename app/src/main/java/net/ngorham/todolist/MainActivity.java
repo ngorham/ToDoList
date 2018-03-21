@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
         final List<Object> notes = dao.fetchAllNotes();
         dao.close();
         //Set up Adapter
-        todoAdapter = new ToDoListAdapter(notes);
+        todoAdapter = new ToDoListAdapter(notes, 0);
         todoRecycler.setAdapter(todoAdapter);
         //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
@@ -57,6 +57,8 @@ public class MainActivity extends Activity {
                 intent.putExtra("NAME", name);
                 startActivity(intent);
             }
+            @Override
+            public void deleteItem(View v, int position){}
         });
 
     }

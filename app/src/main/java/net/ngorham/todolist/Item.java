@@ -14,19 +14,21 @@ public class Item {
     private Date createdOn;
     private Date lastModified;
     private int strike = 0;
+    private int position = 0;
 
     //Default constructor
     public Item(){
-        this(0,"",null,null,0, 0);
+        this(0,"",null,null,0, 0, 0);
     }
 
-    public Item(int id, String name, Date createdOn, Date lastModified, int noteId, int strike){
+    public Item(int id, String name, Date createdOn, Date lastModified, int noteId, int strike, int position){
         setId(id);
         setName(name);
         setCreatedOn(createdOn);
         setLastModified(lastModified);
         setNoteId(noteId);
         setStrike(strike);
+        setPosition(position);
     }
 
     public void setId(int id){
@@ -53,6 +55,10 @@ public class Item {
         this.strike = strike;
     }
 
+    public void setPosition(int position){
+        this.position = position;
+    }
+
     public int getId(){ return id; }
 
     public String getName(){ return name; }
@@ -64,4 +70,6 @@ public class Item {
     public int getNoteId(){ return noteId; }
 
     public int getStrike(){ return strike; }
+
+    public int getPosition(){ return position; }
 }

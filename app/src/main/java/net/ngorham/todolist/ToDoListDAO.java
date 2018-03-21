@@ -137,6 +137,43 @@ public class ToDoListDAO {
         }
     }
 
+    //Create (add) new Item to db
+    public boolean addItem(Item item){
+        //Set content values
+        ContentValues values = new ContentValues();
+        values.put("NAME", item.getName());
+        values.put("LIST_ID", item.getNoteId());
+        values.put("STRIKE", item.getStrike());
+        //Insert into db
+        try{
+            long results = db.insert("ITEM", null, values);
+            return (results > -1);
+        } catch (SQLiteException e){
+            Toast.makeText(context,
+                    "Database unavailable, failed to insert item into table",
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    //Update Note in db
+    public boolean updateItem(Item item){
+        //Set content values
+        ContentValues values = new ContentValues();
+        values.put("NAME", item.getName());
+        //update note where note.id matches
+        try{
+            int results = db.update("ITEM", values, "_id = ?",
+                    new String[] {String.valueOf(item.getId())});
+            return (results > 0);
+        } catch (SQLiteException e){
+            Toast.makeText(context,
+                    "Database unavailable, failed to update item from table",
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
     //Update Item STRIKE column  in db
     public boolean updateStrike(Item item){
         //Set content values
@@ -172,7 +209,8 @@ public class ToDoListDAO {
                     Date createdOn = new Date(cursor.getLong(3) * 1000);
                     Date lastModified = new Date(cursor.getLong(4) * 1000);
                     int strike = cursor.getInt(5);
-                    Item item = new Item(id, name, createdOn, lastModified, noteId, strike);
+                    int position = cursor.getInt(6);
+                    Item item = new Item(id, name, createdOn, lastModified, noteId, strike, position);
                     items.add(item);
                     cursor.moveToNext();
                 }
