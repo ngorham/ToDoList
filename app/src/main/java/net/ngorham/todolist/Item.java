@@ -11,8 +11,8 @@ public class Item {
     private int id;
     private int noteId;
     private String name;
-    private Date createdOn;
-    private Date lastModified;
+    private String createdOn;
+    private String lastModified;
     private int strike = 0;
     private int position = 0;
 
@@ -21,7 +21,7 @@ public class Item {
         this(0,"",null,null,0, 0, 0);
     }
 
-    public Item(int id, String name, Date createdOn, Date lastModified, int noteId, int strike, int position){
+    public Item(int id, String name, String createdOn, String lastModified, int noteId, int strike, int position){
         setId(id);
         setName(name);
         setCreatedOn(createdOn);
@@ -39,11 +39,11 @@ public class Item {
         this.name = name;
     }
 
-    public void setCreatedOn(Date createdOn){
+    public void setCreatedOn(String createdOn){
         this.createdOn = createdOn;
     }
 
-    public void setLastModified(Date lastModified){
+    public void setLastModified(String lastModified){
         this.lastModified = lastModified;
     }
 
@@ -63,9 +63,9 @@ public class Item {
 
     public String getName(){ return name; }
 
-    public Date getCreatedOn(){ return createdOn; }
+    public String getCreatedOn(){ return createdOn; }
 
-    public Date getLastModified(){ return lastModified; }
+    public String  getLastModified(){ return lastModified; }
 
     public int getNoteId(){ return noteId; }
 

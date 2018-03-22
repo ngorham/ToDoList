@@ -73,10 +73,10 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             } else {
                 holder.getNameLabel().setPaintFlags(0);
             }
-            SimpleDateFormat dateFormat =
-                    new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            String lastModifiedDate = dateFormat.format(item.getLastModified());
-            holder.getLastModifiedLabel().setText(lastModifiedDate);
+            //SimpleDateFormat dateFormat =
+            //        new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            //String lastModifiedDate = dateFormat.format(item.getLastModified());
+            holder.getLastModifiedLabel().setText(item.getLastModified());
         }
         holder.getNameLabel().setOnClickListener(new View.OnClickListener(){
             @Override

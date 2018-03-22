@@ -9,8 +9,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
 
 /**
  * Created by NBG on 3/14/2018.
@@ -39,6 +39,8 @@ public class ToDoListDAO {
         //Set content values
         ContentValues values = new ContentValues();
         values.put("NAME", note.getName());
+        values.put("CREATED_ON", note.getCreatedOn());
+        values.put("LAST_MODIFIED", note.getLastModified());
         //Insert into db
         try{
             long results = db.insert("NOTE", null, values);
@@ -72,6 +74,7 @@ public class ToDoListDAO {
         //Set content values
         ContentValues values = new ContentValues();
         values.put("NAME", note.getName());
+        values.put("LAST_MODIFIED", note.getLastModified());
         //update note where note.id matches
         try{
             int results = db.update("NOTE", values, "_id = ?",
@@ -82,6 +85,34 @@ public class ToDoListDAO {
                     "Database unavailable, failed to update item from table",
                     Toast.LENGTH_SHORT).show();
             return false;
+        }
+    }
+
+    //Get Note id by createdOn and lastModified times
+    public int fetchNoteId(String createdOn){
+        int id = 0;
+        String[] columns = {"_id"};
+        String selection = "CREATED_ON = ? AND LAST_MODIFIED = ?";
+        String[] selectionArgs = {createdOn, createdOn};
+        try{
+            id = 0;
+            Cursor cursor = db.query("NOTE",
+                    columns,
+                    selection, selectionArgs,
+                    null, null, null);
+            if(cursor.moveToFirst()){
+                while(!cursor.isAfterLast()){
+                    id = cursor.getInt(0);
+                    cursor.moveToNext();
+                }
+                cursor.close();
+            }
+            return id;
+        } catch(SQLiteException e){
+            Toast.makeText(context,
+                    "Database unavailable, failed to fetch item from table",
+                    Toast.LENGTH_SHORT).show();
+            return id;
         }
     }
 
@@ -122,7 +153,9 @@ public class ToDoListDAO {
                 while(!cursor.isAfterLast()){
                     int id = cursor.getInt(0);
                     String name = cursor.getString(1);
-                    Note note = new Note(id, name);
+                    String createdOn = cursor.getString(2);
+                    String lastModified = cursor.getString(3);
+                    Note note = new Note(id, name, createdOn, lastModified);
                     notes.add(note);
                     cursor.moveToNext();
                 }
@@ -143,7 +176,10 @@ public class ToDoListDAO {
         ContentValues values = new ContentValues();
         values.put("NAME", item.getName());
         values.put("LIST_ID", item.getNoteId());
+        values.put("CREATED_ON", item.getCreatedOn());
+        values.put("LAST_MODIFIED", item.getLastModified());
         values.put("STRIKE", item.getStrike());
+        values.put("POSITION", item.getPosition());
         //Insert into db
         try{
             long results = db.insert("ITEM", null, values);
@@ -156,11 +192,13 @@ public class ToDoListDAO {
         }
     }
 
-    //Update Note in db
+    //Update Item in db
     public boolean updateItem(Item item){
         //Set content values
         ContentValues values = new ContentValues();
         values.put("NAME", item.getName());
+        values.put("LAST_MODIFIED", item.getLastModified());
+        values.put("POSITION", item.getPosition());
         //update note where note.id matches
         try{
             int results = db.update("ITEM", values, "_id = ?",
@@ -169,6 +207,22 @@ public class ToDoListDAO {
         } catch (SQLiteException e){
             Toast.makeText(context,
                     "Database unavailable, failed to update item from table",
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    //Delete Item by id
+    public boolean deleteItem(int itemId){
+        //Delete note where id matches
+        try{
+            int results = db.delete("ITEM",
+                    "_id = " + String.valueOf(itemId),
+                    null);
+            return (results > 0);
+        } catch (SQLiteException e){
+            Toast.makeText(context,
+                    "Database unavailable, failed to delete item from table",
                     Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -200,14 +254,14 @@ public class ToDoListDAO {
             String[] selectionArgs = new String[] {String.valueOf(listId)};
             Cursor cursor = db.query("ITEM",null,
                     "LIST_ID = ?", selectionArgs,
-                    null, null, "_id");
+                    null, null, "POSITION");
             if(cursor.moveToFirst()) {
                 while(!cursor.isAfterLast()){
                     int id = cursor.getInt(0);
                     String name = cursor.getString(1);
                     int noteId = cursor.getInt(2);
-                    Date createdOn = new Date(cursor.getLong(3) * 1000);
-                    Date lastModified = new Date(cursor.getLong(4) * 1000);
+                    String createdOn = cursor.getString(3);
+                    String lastModified = cursor.getString(4);
                     int strike = cursor.getInt(5);
                     int position = cursor.getInt(6);
                     Item item = new Item(id, name, createdOn, lastModified, noteId, strike, position);

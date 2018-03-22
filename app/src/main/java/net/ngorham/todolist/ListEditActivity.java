@@ -20,17 +20,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
 
 public class ListEditActivity extends Activity {
     //Public constants
     public static final String EXTRA_LIST_ID = "id";
 
     //Private variables
-    int listId;
-    String listName;
+    private Note list = new Note();
+    private boolean changes = false;
     private ActionBar actionBar;
     private EditText listNameField;
     private List<Object> itemObjs;
@@ -52,17 +55,18 @@ public class ListEditActivity extends Activity {
         todoLayoutManager = new LinearLayoutManager(this);
         todoRecycler.setLayoutManager(todoLayoutManager);
         final List<Object> items;
+        //Set up DAO
+        dao = new ToDoListDAO(this);
         //Store data received from intent
-        listId = (int)getIntent().getExtras().get(EXTRA_LIST_ID);
+        int listId = (int)getIntent().getExtras().get(EXTRA_LIST_ID);
         if(listId > 0) { //Edit existing list
-            listName = getIntent().getStringExtra("NAME");
-            //Set up DAO
-            dao = new ToDoListDAO(this);
+            String listName = getIntent().getStringExtra("NAME");
+            list.setName(listName);
+            list.setId(listId);
             //DB call and close
-            items = dao.fetchAllItems(listId);
-            dao.close();
+            items = dao.fetchAllItems(list.getId());
+            //dao.close();
         } else { //Create new list
-            listName = "";
             items = new ArrayList<>();
         }
         //Add AddItem options to top and bottom of recyclerView
@@ -90,8 +94,10 @@ public class ListEditActivity extends Activity {
                 Log.v("deleteItem", "itemObjs count: " + itemObjs.size());
                 int id = ((Item)itemObjs.get(position)).getId();
                 if(id > 0) {
-                    Integer itemId = new Integer(id);
-                    deletedItems.add(itemId);
+                    deletedItems.add(id);
+                    changes = true;
+                } else {
+                    changes = false;
                 }
                 itemObjs.remove(position);
                 todoAdapter.notifyDataSetChanged();
@@ -110,14 +116,22 @@ public class ListEditActivity extends Activity {
         actionBar.setCustomView(R.layout.text_field);
         listNameField = (EditText)actionBar.getCustomView()
                 .findViewById(R.id.field);
-        listNameField.setText(listName, TextView.BufferType.EDITABLE);
+        listNameField.setText(list.getName(), TextView.BufferType.EDITABLE);
         //Set EditText listener
         listNameField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 Toast.makeText(getApplicationContext(), "EditText action listener called", Toast.LENGTH_LONG).show();
-                //Check for empty string in EditText
-                return false;
+                String newListName = listNameField.getText().toString();
+                if(list.getName().equals(newListName)){
+                    //do nothing
+                    changes = false;
+                    return false;
+                }
+                listNameField.setText(newListName, TextView.BufferType.EDITABLE);
+
+                changes = true;
+                return true;
             }
         });
         actionBar.setDisplayOptions(getActionBar().DISPLAY_SHOW_CUSTOM);
@@ -131,7 +145,78 @@ public class ListEditActivity extends Activity {
     @Override
     public void onDestroy(){
         super.onDestroy();
+        Log.v("onDestroy","changes made:" + changes);
+        if(changes){
+            Toast.makeText(getApplicationContext(), "Changes made", Toast.LENGTH_SHORT).show();
+            String newListName = listNameField.getText().toString();
+            if(newListName.equals("")){
+                newListName = getDateString();
+            }
+            if(list.getId() > 0){
+                //update list in db
+                list.setLastModified(getDateTime());
+                list.setName(newListName);
+                dao.updateNote(list);
+                //Remove items for db
+                if(!deletedItems.isEmpty()){
+                    for(int itemId : deletedItems){
+                        dao.deleteItem(itemId);
+                    }
+                }
+                //Add new items, update old items
+                if(!itemObjs.isEmpty()){
+                    //Remove first and last AddItem objects
+                    itemObjs.remove(0);
+                    itemObjs.remove(itemObjs.size() - 1);
+                    int position = 0;
+                    for(Object item : itemObjs){
+                        ((Item)item).setPosition(position);
+                        if(((Item)item).getId() == 0){//add new item
+                            dao.addItem((Item)item);
+                        } else {
+                            dao.updateItem((Item)item);
+                        }
+                        position++;
+                    }
+                }
+            } else {
+                //add new list to db
+                list.setCreatedOn(getDateTime());
+                list.setLastModified(getDateTime());
+                list.setName(newListName);
+                dao.addNote(list);
+                int listIdFromDb = dao.fetchNoteId(list.getCreatedOn());
+                if(listIdFromDb == 0){
+                    Toast.makeText(getApplicationContext(),
+                            "Database unavailable, cannot access",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Toast.makeText(getApplicationContext(), "id from db: " + listIdFromDb, Toast.LENGTH_SHORT).show();
+                //Remove items for db
+                if(!deletedItems.isEmpty()){
+                    for(int itemId : deletedItems){
+                        dao.deleteItem(itemId);
+                    }
+                }
+                //Add new items
+                if(!itemObjs.isEmpty()){
+                    //Remove first and last AddItem objects
+                    itemObjs.remove(0);
+                    itemObjs.remove(itemObjs.size() - 1);
+                    int position = 0;
+                    for(Object item : itemObjs){
+                        ((Item)item).setPosition(position);
+                        ((Item)item).setNoteId(listIdFromDb);
+                        dao.addItem((Item)item);
+                        position++;
+                    }
+                }
+            }
 
+        } else {
+            Toast.makeText(getApplicationContext(), "Changes not made", Toast.LENGTH_SHORT).show();
+        }
     }
     @Override
     public void onResume(){
@@ -216,25 +301,26 @@ public class ListEditActivity extends Activity {
                     Toast.makeText(getApplicationContext(),
                             "Add Item field is empty",
                             Toast.LENGTH_SHORT).show();
+                    changes = false;
                     return;
                 }
                 Log.v("addItemDialog", "addItemField: " + addItemName);
                 Item newItem = new Item();
                 newItem.setName(addItemName);
                 Log.v("addItemDialog", "newItem.name: " + newItem.getName());
-                newItem.setCreatedOn(new Date());
-                newItem.setLastModified(new Date());
-                newItem.setNoteId(listId);
+                newItem.setCreatedOn(getDateTime());
+                newItem.setLastModified(getDateTime());
+                newItem.setNoteId(list.getId());
                 if(position == 0){
                     newPos = position + 1;
                 } else {
                     newPos = position;
                 }
-                newItem.setPosition(newPos);
                 itemObjs.add(newPos, newItem);
                 Log.v("addItemDialog", "items.count: " + itemObjs.size());
                 Log.v("addItemDialog", "todoAdapter.count: " + todoAdapter.getItemCount());
                 todoAdapter.notifyDataSetChanged();
+                changes = true; //changes to list made
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -261,23 +347,27 @@ public class ListEditActivity extends Activity {
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                //Check for item.name and editItemField.text equality
-                //if not equal
-                //update item.name
                 //update item.name in db
-                //update recycler view
-                //if equal do nothing
                 String editItemName = editItemField.getText().toString();
                 if(editItemName.equals("")){
                     //delete item
+                    int id = ((Item)itemObjs.get(position)).getId();
+                    if(id > 0) {
+                        deletedItems.add(id);
+                        changes = true;
+                    }
+                    itemObjs.remove(position);
                 } else if(editItemName.equals(itemName)){
                     //do nothing
                     Toast.makeText(getApplicationContext(), "Item name is the same", Toast.LENGTH_SHORT).show();
+                    changes = false;
                 } else{
                     //update item name
                     textView.setText(editItemName);
                     ((Item) itemObjs.get(position)).setName(editItemName);
+                    ((Item) itemObjs.get(position)).setLastModified(getDateTime());
                     Log.v("editItemDialog", "item.name: " + ((Item)itemObjs.get(position)).getName());
+                    changes = true;
                 }
             }
         });
@@ -290,5 +380,23 @@ public class ListEditActivity extends Activity {
         builder.setCancelable(true);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    //Utility that creates a string of the current date and time
+    public String getDateTime(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss", Locale.getDefault()
+        );
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
+
+    //Utility that creates a string of the current date
+    public String getDateString(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "MM-dd-yyyy", Locale.getDefault()
+        );
+        Date date = new Date();
+        return "(" + dateFormat.format(date) + ")";
     }
 }
