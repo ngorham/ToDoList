@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -24,7 +25,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 
 public class ListEditActivity extends Activity {
@@ -34,6 +34,8 @@ public class ListEditActivity extends Activity {
     //Private variables
     private Note list = new Note();
     private boolean changes = false;
+    private boolean deleteListCalled = false;
+    private boolean deleteListAfterChanges = false;
     private ActionBar actionBar;
     private EditText listNameField;
     private List<Object> itemObjs;
@@ -89,9 +91,6 @@ public class ListEditActivity extends Activity {
             }
             @Override
             public void deleteItem(View view, int position){
-                Log.v("deleteItem", "delete clicked pos: " + position);
-                Log.v("deleteItem", "deletedItems count: " + deletedItems.size());
-                Log.v("deleteItem", "itemObjs count: " + itemObjs.size());
                 int id = ((Item)itemObjs.get(position)).getId();
                 if(id > 0) {
                     deletedItems.add(id);
@@ -101,9 +100,6 @@ public class ListEditActivity extends Activity {
                 }
                 itemObjs.remove(position);
                 todoAdapter.notifyDataSetChanged();
-                Log.v("deleteItem", "deletedItems count: " + deletedItems.size());
-                Log.v("deleteItem", "itemObjs count: " + itemObjs.size());
-                Toast.makeText(getApplicationContext(), "delete clicked pos" + position, Toast.LENGTH_SHORT).show();
             }
         });
         //Add divider item decoration
@@ -114,14 +110,13 @@ public class ListEditActivity extends Activity {
         actionBar = getActionBar();
         //Set EditText view in actionBar
         actionBar.setCustomView(R.layout.text_field);
-        listNameField = (EditText)actionBar.getCustomView()
+        listNameField = actionBar.getCustomView()
                 .findViewById(R.id.field);
         listNameField.setText(list.getName(), TextView.BufferType.EDITABLE);
         //Set EditText listener
         listNameField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                Toast.makeText(getApplicationContext(), "EditText action listener called", Toast.LENGTH_LONG).show();
                 String newListName = listNameField.getText().toString();
                 if(list.getName().equals(newListName)){
                     //do nothing
@@ -134,7 +129,7 @@ public class ListEditActivity extends Activity {
                 return true;
             }
         });
-        actionBar.setDisplayOptions(getActionBar().DISPLAY_SHOW_CUSTOM);
+        actionBar.setDisplayOptions(actionBar.DISPLAY_SHOW_CUSTOM);
     }
 
     @Override
@@ -145,8 +140,7 @@ public class ListEditActivity extends Activity {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        Log.v("onDestroy","changes made:" + changes);
-        if(changes){
+        if(changes && !deleteListAfterChanges){
             Toast.makeText(getApplicationContext(), "Changes made", Toast.LENGTH_SHORT).show();
             String newListName = listNameField.getText().toString();
             if(newListName.equals("")){
@@ -192,7 +186,6 @@ public class ListEditActivity extends Activity {
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Toast.makeText(getApplicationContext(), "id from db: " + listIdFromDb, Toast.LENGTH_SHORT).show();
                 //Remove items for db
                 if(!deletedItems.isEmpty()){
                     for(int itemId : deletedItems){
@@ -214,9 +207,18 @@ public class ListEditActivity extends Activity {
                 }
             }
 
+        } else if(deleteListAfterChanges || deleteListCalled) {
+            if(itemObjs.size() > 2) { //db call only if list is populated
+                dao.deleteAllItems(list.getId());
+            }
+            if(list.getId() > 0) {
+                dao.deleteNote(list.getId());
+            }
         } else {
             Toast.makeText(getApplicationContext(), "Changes not made", Toast.LENGTH_SHORT).show();
         }
+        //Db close
+        dao.close();
     }
     @Override
     public void onResume(){
@@ -265,8 +267,8 @@ public class ListEditActivity extends Activity {
         //Handle action items
         switch(item.getItemId()){
             case R.id.delete_list:
-                //Add list action
                 Toast.makeText(this, "Delete list action", Toast.LENGTH_SHORT).show();
+                deleteListDialog();
                 return true;
             case R.id.app_settings:
                 //Settings action
@@ -284,8 +286,7 @@ public class ListEditActivity extends Activity {
     }
 
     //Displays Add Item AlertDialog
-    public void addItemDialog(final int position){
-        Log.v("addItemDialog", "item position: " + position);
+    private void addItemDialog(final int position){
         //Create AlertDialog.Builder
         AlertDialog.Builder builder = new AlertDialog.Builder(ListEditActivity.this);
         builder.setTitle(R.string.add_item);
@@ -304,10 +305,8 @@ public class ListEditActivity extends Activity {
                     changes = false;
                     return;
                 }
-                Log.v("addItemDialog", "addItemField: " + addItemName);
                 Item newItem = new Item();
                 newItem.setName(addItemName);
-                Log.v("addItemDialog", "newItem.name: " + newItem.getName());
                 newItem.setCreatedOn(getDateTime());
                 newItem.setLastModified(getDateTime());
                 newItem.setNoteId(list.getId());
@@ -317,8 +316,6 @@ public class ListEditActivity extends Activity {
                     newPos = position;
                 }
                 itemObjs.add(newPos, newItem);
-                Log.v("addItemDialog", "items.count: " + itemObjs.size());
-                Log.v("addItemDialog", "todoAdapter.count: " + todoAdapter.getItemCount());
                 todoAdapter.notifyDataSetChanged();
                 changes = true; //changes to list made
             }
@@ -335,7 +332,7 @@ public class ListEditActivity extends Activity {
     }
 
     //Displays Edit Item AlertDialog
-    public void editItemDialog(View view, final int position){
+    private void editItemDialog(View view, final int position){
         final String itemName = ((Item)itemObjs.get(position)).getName();
         final TextView textView = (TextView)view;
         AlertDialog.Builder builder = new AlertDialog.Builder(ListEditActivity.this);
@@ -366,7 +363,6 @@ public class ListEditActivity extends Activity {
                     textView.setText(editItemName);
                     ((Item) itemObjs.get(position)).setName(editItemName);
                     ((Item) itemObjs.get(position)).setLastModified(getDateTime());
-                    Log.v("editItemDialog", "item.name: " + ((Item)itemObjs.get(position)).getName());
                     changes = true;
                 }
             }
@@ -375,6 +371,36 @@ public class ListEditActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //cancel, return to activity
+            }
+        });
+        builder.setCancelable(true);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    //Display Delete List AlertDialog
+    private void deleteListDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListEditActivity.this);
+        builder.setTitle("Delete");
+        builder.setIcon(R.drawable.ic_warning_black_18dp);
+        builder.setMessage("Are you sure you want to delete this list?");
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteListCalled = true;
+                if(changes){ deleteListAfterChanges = true; }
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //cancel, return to activity
+                deleteListCalled = false;
+                deleteListAfterChanges = false;
             }
         });
         builder.setCancelable(true);

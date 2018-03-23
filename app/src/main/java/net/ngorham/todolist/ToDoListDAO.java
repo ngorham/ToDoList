@@ -278,4 +278,19 @@ public class ToDoListDAO {
             return items;
         }
     }
+
+    //Delete all Items from db where listId matches
+    public boolean deleteAllItems(int listId){
+        try{
+            int results = db.delete("ITEM",
+                    "LIST_ID = " + String.valueOf(listId),
+                    null);
+            return (results > 0);
+        } catch(SQLiteException e){
+            Toast.makeText(context,
+                    "Database unavailable, failed to delete item from table",
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
 }
