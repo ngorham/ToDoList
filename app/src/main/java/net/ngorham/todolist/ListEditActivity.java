@@ -205,6 +205,15 @@ public class ListEditActivity extends Activity {
                 Toast.makeText(this, "Delete list action", Toast.LENGTH_SHORT).show();
                 deleteListDialog();
                 return true;
+            case R.id.save_list:
+                updateDB();
+                Intent intent = new Intent(this, ListDetailActivity.class);
+                intent.putExtra(ListEditActivity.EXTRA_LIST_ID, list.getId());
+                intent.putExtra("NAME", list.getName());
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+                return true;
             case R.id.app_settings:
                 //Settings action
                 Toast.makeText(this, "Settings action", Toast.LENGTH_SHORT).show();

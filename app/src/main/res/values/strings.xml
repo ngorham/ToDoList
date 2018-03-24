@@ -4,6 +4,7 @@
     <string name="add_list">Add</string>
     <string name="edit_list">Edit</string>
     <string name="delete_list">Delete</string>
+    <string name="save_list">Save</string>
     <string name="text_field">Editable Text</string>
     <string name="add_item">Add Item</string>
     <string name="edit_item">Edit Item</string>
