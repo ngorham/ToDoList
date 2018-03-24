@@ -1,6 +1,8 @@
 package net.ngorham.todolist;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Paint;
@@ -18,15 +20,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
 public class ListDetailActivity extends Activity {
     //Public constants
     public static final String EXTRA_LIST_ID = "id";
 
     //Private variables
-    int listId;
-    String listName;
+    private Note list = new Note();
+    private boolean changes = false;
+    private Boolean listChanges = false;
+    //Private constants
+    private final String TAG = "ListDetailActivity"; //debug
     //Recycler View variables
     private RecyclerView todoRecycler;
     private ToDoListAdapter todoAdapter;
@@ -60,30 +64,31 @@ public class ListDetailActivity extends Activity {
         //Set up Layout Manager
         todoLayoutManager = new LinearLayoutManager(this);
         todoRecycler.setLayoutManager(todoLayoutManager);
-        //Store data received from intent
-        listId = (int)getIntent().getExtras().get(EXTRA_LIST_ID);
-        if(listId > 0) { listName = getIntent().getStringExtra("NAME"); }
-        else { listName = ""; }
-        //Set ActionBar title
-        getActionBar().setTitle(listName);
         //Set up DAO
         dao = new ToDoListDAO(this);
-        //DB call and close
-        final List<Object> items = dao.fetchAllItems(listId);
+        //Store data received from intent
+        int listId = (int)getIntent().getExtras().get(EXTRA_LIST_ID);
+        if(listId > 0) {
+            String listName = getIntent().getStringExtra("NAME");
+            list.setName(listName);
+            list.setId(listId);
+        }
+        //Set ActionBar title
+        getActionBar().setTitle(list.getName());
         //Set up Adapter
-        todoAdapter = new ToDoListAdapter(items, 0);
+        todoAdapter = new ToDoListAdapter(dao.fetchAllItems(list.getId()), 0);
         todoRecycler.setAdapter(todoAdapter);
         //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
             public void onClick(View view, int position){
                 TextView textView = (TextView)view;
-                Item item = (Item)items.get(position);
+                Item item = (Item)todoAdapter.getList().get(position);
                 if(item.getStrike() == 0){
-                    textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    textView.setPaintFlags(textView.getPaintFlags()
+                            | Paint.STRIKE_THRU_TEXT_FLAG);
                     item.setStrike(1);
-                } else {
-                    //Remove strike through
+                } else { //Remove strike through
                     textView.setPaintFlags(0);
                     item.setStrike(0);
                 }
@@ -104,9 +109,56 @@ public class ListDetailActivity extends Activity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "INSIDE: onStart");
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.d(TAG, "INSIDE: onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "INSIDE: onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "INSIDE: onStop");
+    }
+
+    @Override
     public void onDestroy(){
         super.onDestroy();
+        Log.d(TAG, "INSIDE: onDestroy");
         dao.close();
+    }
+
+    @Override
+    protected void onRestart(){
+        super.onRestart();
+        Log.d(TAG, "INSIDE: onRestart");
+        Log.d(TAG, "INSIDE: onRestart: changes " + listChanges);
+        if(listChanges){
+            todoAdapter.setList(dao.fetchAllItems(list.getId()));
+            todoAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                listChanges = data.getExtras().getBoolean("changes");
+                Log.d(TAG, "INSIDE: onActivityResult: changes " + listChanges);
+            }
+        }
     }
 
     @Override
@@ -149,24 +201,55 @@ public class ListDetailActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item){
         //Handle action items
         switch(item.getItemId()){
-            case R.id.edit_list:
-                //Edit list action
-                Toast.makeText(this, "Edit list action", Toast.LENGTH_SHORT).show();
+            case R.id.edit_list: //Edit list action
                 Intent intent = new Intent(this, ListEditActivity.class);
-                intent.putExtra(ListEditActivity.EXTRA_LIST_ID, listId);
-                intent.putExtra("NAME", listName);
-                startActivity(intent);
+                intent.putExtra(ListEditActivity.EXTRA_LIST_ID, list.getId());
+                intent.putExtra("NAME", list.getName());
+                startActivityForResult(intent, 1);
                 return true;
-            case R.id.delete_list:
-                //Delete list action
-                Toast.makeText(this, "Delete list action", Toast.LENGTH_SHORT).show();
+            case R.id.delete_list: //Delete list action
+                deleteListDialog();
                 return true;
-            case R.id.app_settings:
-                //Settings action
+            case R.id.app_settings: //Settings action
                 Toast.makeText(this, "Settings action", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    //Display Delete List AlertDialog
+    private void deleteListDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListDetailActivity.this);
+        builder.setTitle("Delete");
+        builder.setIcon(R.drawable.ic_warning_black_18dp);
+        builder.setMessage("Are you sure you want to delete this list?");
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                changes = true;
+                //Delete list
+                if(todoAdapter.getList().size() > 2){ //db call only if list is populated
+                    dao.deleteAllItems(list.getId());
+                }
+                dao.deleteNote(list.getId());
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("changes", changes);
+                setResult(RESULT_OK, intent);
+                startActivityForResult(intent, 1);
+                finish();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //cancel, return to activity
+                changes = false;
+            }
+        });
+        builder.setCancelable(true);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

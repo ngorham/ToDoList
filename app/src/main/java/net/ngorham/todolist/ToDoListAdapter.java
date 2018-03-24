@@ -6,11 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by NBG on 3/14/2018.
@@ -33,7 +30,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void deleteItem(View view, int position);
     }
 
-    //Constructor with List parameter
+    //Constructor
     public ToDoListAdapter(List<Object> items, int editType){
         this.items = items;
         this.editType = editType;
@@ -195,4 +192,10 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         //Return number of items in the data set
         return items.size();
     }
+
+    //Replace current list with new or updated list
+    public void setList(List<Object> items){ this.items = items; }
+
+    //Return reference to List<Object> items
+    public List<Object> getList(){ return items; }
 }

@@ -13,13 +13,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
 public class MainActivity extends Activity {
     //Private variables
-    private int listId = 0;
-    //Dummy text for testing
-    private String[] todos = {"Test List 1", "Test List 2"};
+    private Boolean listChanges = false;
+    //Private constants
+    private final String TAG = "MainActivity"; //debug
     //Recycler View variables
     private RecyclerView todoRecycler;
     private ToDoListAdapter todoAdapter;
@@ -32,26 +31,22 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Set up recycler view
-        todoRecycler = (RecyclerView)findViewById(R.id.todo_recycler);
+        todoRecycler = findViewById(R.id.todo_recycler);
         //Set up Layout Manager
         todoLayoutManager = new LinearLayoutManager(this);
         todoRecycler.setLayoutManager(todoLayoutManager);
         //Set up DAO
         dao = new ToDoListDAO(this);
-        //Db call and close
-        final List<Object> notes = dao.fetchAllNotes();
-        dao.close();
         //Set up Adapter
-        todoAdapter = new ToDoListAdapter(notes, 0);
+        todoAdapter = new ToDoListAdapter(dao.fetchAllNotes(), 0);
         todoRecycler.setAdapter(todoAdapter);
         //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
             public void onClick(View view, int position){
-                Note note = (Note)notes.get(position);
+                Note note = (Note)todoAdapter.getList().get(position);
                 int id = note.getId();
                 String name = note.getName();
-                //Start activity of list clicked
                 Intent intent = new Intent(getApplicationContext(), ListDetailActivity.class);
                 intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, id);
                 intent.putExtra("NAME", name);
@@ -60,12 +55,65 @@ public class MainActivity extends Activity {
             @Override
             public void deleteItem(View v, int position){}
         });
-
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState){
         super.onPostCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "INSIDE: onStart");
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d(TAG, "INSIDE: onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "INSIDE: onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "INSIDE: onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "INSIDE: onDestroy");
+        dao.close();
+    }
+
+    @Override
+    protected void onRestart(){
+        super.onRestart();
+        Log.d(TAG, "INSIDE: onRestart");
+        Log.d(TAG, "INSIDE: onRestart: changes " + listChanges);
+        if(listChanges){
+            todoAdapter.setList(dao.fetchAllNotes());
+            todoAdapter.notifyDataSetChanged();
+        }
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                listChanges = data.getExtras().getBoolean("changes");
+                Log.d(TAG, "INSIDE: onActivityResult: changes " + listChanges);
+            }
+        }
     }
 
     @Override
@@ -108,16 +156,12 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item){
         //Handle action items
         switch(item.getItemId()){
-            case R.id.add_list:
-                //Add list action
-                Toast.makeText(this, "Add list action", Toast.LENGTH_SHORT).show();
+            case R.id.add_list: //Add list action
                 Intent intent = new Intent(this, ListEditActivity.class);
                 intent.putExtra(ListEditActivity.EXTRA_LIST_ID, 0);
-                //listId = 0 -> new list with no name
-                startActivity(intent);
+                startActivityForResult(intent, 1);
                 return true;
-            case R.id.app_settings:
-                //Settings action
+            case R.id.app_settings: //Settings action
                 Toast.makeText(this, "Settings action", Toast.LENGTH_SHORT).show();
                 return true;
             default:

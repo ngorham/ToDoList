@@ -20,9 +20,4 @@ public class NoteViewHolder extends RecyclerView.ViewHolder {
 
     //Return reference of TextView nameLabel
     public TextView getNameLabel(){ return nameLabel; }
-
-    //Set reference of TextView nameLabel
-    public void setNameLabel(TextView nameLabel){
-        this.nameLabel = nameLabel;
-    }
 }
