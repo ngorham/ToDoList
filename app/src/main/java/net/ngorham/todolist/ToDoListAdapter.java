@@ -17,7 +17,8 @@ import java.util.List;
 public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     //Private variables
     private Listener listener;
-    private List<Object> items;
+    private List<Item> items;
+    private List<Note> notes;
     private int editType = 0;
     //Private constants
     private final int NOTE_TYPE = 0;
@@ -30,9 +31,15 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void deleteItem(View view, int position);
     }
 
-    //Constructor
-    public ToDoListAdapter(List<Object> items, int editType){
+    //Constructor with List<Item>
+    public ToDoListAdapter(List<Item> items, int editType){
         this.items = items;
+        this.editType = editType;
+    }
+
+    //Constructor with List<Note>
+    public ToDoListAdapter(int editType, List<Note> notes){
+        this.notes = notes;
         this.editType = editType;
     }
 
@@ -43,7 +50,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     //Configure Note type item
     private void configureNote(NoteViewHolder holder, final int position){
-        Note note = (Note)items.get(position);
+        Note note = notes.get(position);
         if(note != null){
             holder.getNameLabel().setText(note.getName());
         }
@@ -60,7 +67,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     //Configure Item type item
     private void configureItem(ItemViewHolder holder, final int position){
-        Item item = (Item)items.get(position);
+        Item item = items.get(position);
         if(item != null){
             holder.getNameLabel().setText(item.getName());
             if(item.getStrike() == 1){
@@ -88,9 +95,9 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     //Configure AddItem type item
     private void configureAddItem(AddItemViewHolder holder, final int position){
-        AddItem item = (AddItem)items.get(position);
+        Item item = items.get(position);
         if(item != null){
-            holder.getTextLabel().setText(item.getText());
+            holder.getTextLabel().setText(item.getName());
         }
         holder.getTextLabel().setOnClickListener(new View.OnClickListener(){
             @Override
@@ -101,6 +108,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         });
     }
+
     //Configure EditItem type item
     private void configureEditItem(EditItemViewHolder holder, final int position){
         Item item = (Item)items.get(position);
@@ -128,16 +136,18 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     //Return the item view type
     @Override
     public int getItemViewType(int position){
-        if(items.get(position) instanceof  Note){
-            return NOTE_TYPE;
-        } else if(items.get(position) instanceof Item){
-            if(editType == 0) {
-                return ITEM_TYPE;
+        if(items != null){ //items
+            if(items.get(position).getName().equals("Add Item")){
+                return ADD_ITEM_TYPE;
             } else {
-                return EDIT_ITEM_TYPE;
+                if (editType == 0) {
+                    return ITEM_TYPE;
+                } else {
+                    return EDIT_ITEM_TYPE;
+                }
             }
-        } else if(items.get(position) instanceof AddItem){
-            return ADD_ITEM_TYPE;
+        } else if(notes != null){ //notes
+            return NOTE_TYPE;
         }
         return -1;
     }
@@ -190,12 +200,22 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public int getItemCount(){
         //Return number of items in the data set
-        return items.size();
+        if(items != null) {
+            return items.size();
+        } else if(notes != null){
+            return notes.size();
+        } else {
+            return 0;
+        }
     }
 
-    //Replace current list with new or updated list
-    public void setList(List<Object> items){ this.items = items; }
+    //Replace current item list with new or updated item list
+    public void setItemList(List<Item> items){ this.items = items; }
 
-    //Return reference to List<Object> items
-    public List<Object> getList(){ return items; }
+    public void setNoteList(List<Note> notes){ this.notes = notes; }
+
+    //Return reference to List<Item> items
+    public List<Item> getItemList(){ return items; }
+
+    public List<Note> getNoteList(){ return  notes; }
 }

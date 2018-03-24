@@ -38,18 +38,16 @@ public class MainActivity extends Activity {
         //Set up DAO
         dao = new ToDoListDAO(this);
         //Set up Adapter
-        todoAdapter = new ToDoListAdapter(dao.fetchAllNotes(), 0);
+        todoAdapter = new ToDoListAdapter(0, dao.fetchAllNotes());
         todoRecycler.setAdapter(todoAdapter);
         //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
             public void onClick(View view, int position){
-                Note note = (Note)todoAdapter.getList().get(position);
-                int id = note.getId();
-                String name = note.getName();
+                Note note = todoAdapter.getNoteList().get(position);
                 Intent intent = new Intent(getApplicationContext(), ListDetailActivity.class);
-                intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, id);
-                intent.putExtra("NAME", name);
+                intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, note.getId());
+                intent.putExtra("NAME", note.getName());
                 startActivity(intent);
             }
             @Override
@@ -99,7 +97,7 @@ public class MainActivity extends Activity {
         Log.d(TAG, "INSIDE: onRestart");
         Log.d(TAG, "INSIDE: onRestart: changes " + listChanges);
         if(listChanges){
-            todoAdapter.setList(dao.fetchAllNotes());
+            todoAdapter.setNoteList(dao.fetchAllNotes());
             todoAdapter.notifyDataSetChanged();
         }
 

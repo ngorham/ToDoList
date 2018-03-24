@@ -145,8 +145,8 @@ public class ToDoListDAO {
     }
 
     //Get all Notes from db
-    public List<Object> fetchAllNotes(){
-        List<Object> notes = new ArrayList<>();
+    public List<Note> fetchAllNotes(){
+        List<Note> notes = new ArrayList<>();
         try{
             Cursor cursor = db.rawQuery("SELECT * FROM NOTE", null);
             if(cursor.moveToFirst()){
@@ -248,8 +248,8 @@ public class ToDoListDAO {
     }
 
     //Get all Items from db where listId matches
-    public List<Object> fetchAllItems(int listId){
-        List<Object> items = new ArrayList<>();
+    public List<Item> fetchAllItems(int listId){
+        List<Item> items = new ArrayList<>();
         try{
             String[] selectionArgs = new String[] {String.valueOf(listId)};
             Cursor cursor = db.query("ITEM",null,

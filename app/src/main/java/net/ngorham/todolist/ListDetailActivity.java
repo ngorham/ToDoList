@@ -83,7 +83,7 @@ public class ListDetailActivity extends Activity {
             @Override
             public void onClick(View view, int position){
                 TextView textView = (TextView)view;
-                Item item = (Item)todoAdapter.getList().get(position);
+                Item item = todoAdapter.getItemList().get(position);
                 if(item.getStrike() == 0){
                     textView.setPaintFlags(textView.getPaintFlags()
                             | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -145,7 +145,8 @@ public class ListDetailActivity extends Activity {
         Log.d(TAG, "INSIDE: onRestart");
         Log.d(TAG, "INSIDE: onRestart: changes " + listChanges);
         if(listChanges){
-            todoAdapter.setList(dao.fetchAllItems(list.getId()));
+            getActionBar().setTitle(list.getName());
+            todoAdapter.setItemList(dao.fetchAllItems(list.getId()));
             todoAdapter.notifyDataSetChanged();
         }
     }
@@ -156,9 +157,22 @@ public class ListDetailActivity extends Activity {
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
                 listChanges = data.getExtras().getBoolean("changes");
+                String newListName = data.getStringExtra("NAME");
+                if(!list.getName().equals(newListName)){
+                    list.setName(newListName);
+                }
                 Log.d(TAG, "INSIDE: onActivityResult: changes " + listChanges);
             }
         }
+    }
+    @Override
+    public void onBackPressed(){
+        Log.d(TAG, "INSIDE: onBackPressed");
+        Log.d(TAG, "INSIDE: onBackPressed changes = " + listChanges);
+        Intent intent = new Intent();
+        intent.putExtra("changes", listChanges);
+        setResult(RESULT_OK, intent);
+        super.onBackPressed();
     }
 
     @Override
@@ -229,7 +243,7 @@ public class ListDetailActivity extends Activity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 changes = true;
                 //Delete list
-                if(todoAdapter.getList().size() > 2){ //db call only if list is populated
+                if(todoAdapter.getItemList().size() > 2){ //db call only if list is populated
                     dao.deleteAllItems(list.getId());
                 }
                 dao.deleteNote(list.getId());

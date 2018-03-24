@@ -57,7 +57,7 @@ public class ListEditActivity extends Activity {
         //Set up Layout Manager
         todoLayoutManager = new LinearLayoutManager(this);
         todoRecycler.setLayoutManager(todoLayoutManager);
-        final List<Object> items;
+        final List<Item> items;
         //Set up DAO
         dao = new ToDoListDAO(this);
         //Store data received from intent
@@ -73,8 +73,12 @@ public class ListEditActivity extends Activity {
             items = new ArrayList<>();
         }
         //Add AddItem options to top and bottom of recyclerView
-        items.add(0, new AddItem());
-        items.add(items.size(), new AddItem());
+        Item front = new Item();
+        front.setName("Add Item");
+        Item back = new Item();
+        back.setName("Add Item");
+        items.add(0, front);
+        items.add(items.size(), back);
         //Create Adapter
         todoAdapter = new ToDoListAdapter(items, 1);
         //Set Adapter
@@ -83,22 +87,22 @@ public class ListEditActivity extends Activity {
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
             public void onClick(View view, int position){
-                if(todoAdapter.getList().get(position) instanceof AddItem){
+                if((todoAdapter.getItemList().get(position)).getName().equals("Add Item")){
                     addItemDialog(position);
-                } else if(todoAdapter.getList().get(position) instanceof Item){
+                } else {
                     editItemDialog(view, position);
                 }
             }
             @Override
             public void deleteItem(View view, int position){
-                int id = ((Item)todoAdapter.getList().get(position)).getId();
+                int id = todoAdapter.getItemList().get(position).getId();
                 if(id > 0) {
                     deletedItems.add(id);
                     changes = true;
                 } else {
                     changes = false;
                 }
-                todoAdapter.getList().remove(position);
+                todoAdapter.getItemList().remove(position);
                 todoAdapter.notifyDataSetChanged();
             }
         });
@@ -147,7 +151,7 @@ public class ListEditActivity extends Activity {
     @Override
     public void onResume(){
         super.onResume();
-        Log.v("onResume", "items.count: " + todoAdapter.getList().size());
+        Log.v("onResume", "items.count: " + todoAdapter.getItemList().size());
     }
 
     @Override
@@ -157,6 +161,7 @@ public class ListEditActivity extends Activity {
         updateDB();
         Intent intent = new Intent();
         intent.putExtra("changes", changes);
+        intent.putExtra("NAME", list.getName());
         setResult(RESULT_OK, intent);
         super.onBackPressed();
     }
@@ -202,16 +207,21 @@ public class ListEditActivity extends Activity {
         //Handle action items
         switch(item.getItemId()){
             case R.id.delete_list:
-                Toast.makeText(this, "Delete list action", Toast.LENGTH_SHORT).show();
                 deleteListDialog();
                 return true;
             case R.id.save_list:
-                updateDB();
-                Intent intent = new Intent(this, ListDetailActivity.class);
+                Intent intent;
+                 if(updateDB()) {
+                     intent = new Intent(this, ListDetailActivity.class);
+                 } else {
+                     intent = new Intent(this, MainActivity.class);
+                 }
                 intent.putExtra(ListEditActivity.EXTRA_LIST_ID, list.getId());
+                intent.putExtra("changes", changes);
                 intent.putExtra("NAME", list.getName());
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                setResult(RESULT_OK, intent);
+                startActivityForResult(intent, 1);
                 finish();
                 return true;
             case R.id.app_settings:
@@ -259,7 +269,7 @@ public class ListEditActivity extends Activity {
                 } else {
                     newPos = position;
                 }
-                todoAdapter.getList().add(newPos, newItem);
+                todoAdapter.getItemList().add(newPos, newItem);
                 todoAdapter.notifyDataSetChanged();
                 changes = true; //changes made to list
             }
@@ -277,8 +287,8 @@ public class ListEditActivity extends Activity {
 
     //Displays Edit Item AlertDialog
     private void editItemDialog(View view, final int position){
-        final String itemName = ((Item)todoAdapter.getList()
-                .get(position)).getName();
+        final String itemName = todoAdapter.getItemList()
+                .get(position).getName();
         final TextView textView = (TextView)view;
         AlertDialog.Builder builder = new AlertDialog.Builder(ListEditActivity.this);
         builder.setTitle(R.string.edit_item);
@@ -293,21 +303,23 @@ public class ListEditActivity extends Activity {
                 String editItemName = editItemField.getText().toString();
                 if(editItemName.equals("")){
                     //delete item
-                    int id = ((Item)todoAdapter.getList().get(position)).getId();
+                    int id = todoAdapter.getItemList().get(position).getId();
                     if(id > 0) {
                         deletedItems.add(id);
                         changes = true;
                     }
-                    todoAdapter.getList().remove(position);
+                    todoAdapter.getItemList().remove(position);
                 } else if(editItemName.equals(itemName)){
                     //do nothing
-                    Toast.makeText(getApplicationContext(), "Item name is the same", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),
+                            "Item name is the same",
+                            Toast.LENGTH_SHORT).show();
                     changes = false;
                 } else{
                     //update item name
                     textView.setText(editItemName);
-                    ((Item) todoAdapter.getList().get(position)).setName(editItemName);
-                    ((Item) todoAdapter.getList().get(position)).setLastModified(getDateTime());
+                    todoAdapter.getItemList().get(position).setName(editItemName);
+                    todoAdapter.getItemList().get(position).setLastModified(getDateTime());
                     changes = true;
                 }
             }
@@ -373,9 +385,10 @@ public class ListEditActivity extends Activity {
     }
 
     //Updates db if changes are made
-    private void updateDB(){
+    private boolean updateDB(){
         if(changes && !deleteListAfterChanges){
-            Toast.makeText(getApplicationContext(), "Changes made", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Saved",
+                    Toast.LENGTH_SHORT).show();
             String newListName = listNameField.getText().toString();
             if(newListName.equals("")){
                 newListName = getDateString();
@@ -392,12 +405,12 @@ public class ListEditActivity extends Activity {
                     }
                 }
                 //Add new items, update old items
-                if(!todoAdapter.getList().isEmpty()){
+                if(!todoAdapter.getItemList().isEmpty()){
                     //Remove first and last AddItem objects
-                    todoAdapter.getList().remove(0);
-                    todoAdapter.getList().remove(todoAdapter.getList().size() - 1);
+                    todoAdapter.getItemList().remove(0);
+                    todoAdapter.getItemList().remove(todoAdapter.getItemList().size() - 1);
                     int position = 0;
-                    for(Object item : todoAdapter.getList()){
+                    for(Object item : todoAdapter.getItemList()){
                         ((Item)item).setPosition(position);
                         if(((Item)item).getId() == 0){//add new item
                             dao.addItem((Item)item);
@@ -418,7 +431,7 @@ public class ListEditActivity extends Activity {
                     Toast.makeText(getApplicationContext(),
                             "Database unavailable, cannot access",
                             Toast.LENGTH_SHORT).show();
-                    return;
+                    return false;
                 }
                 //Remove items for db
                 if(!deletedItems.isEmpty()){
@@ -427,12 +440,12 @@ public class ListEditActivity extends Activity {
                     }
                 }
                 //Add new items
-                if(!todoAdapter.getList().isEmpty()){
+                if(!todoAdapter.getItemList().isEmpty()){
                     //Remove first and last AddItem objects
-                    todoAdapter.getList().remove(0);
-                    todoAdapter.getList().remove(todoAdapter.getList().size() - 1);
+                    todoAdapter.getItemList().remove(0);
+                    todoAdapter.getItemList().remove(todoAdapter.getItemList().size() - 1);
                     int position = 0;
-                    for(Object item : todoAdapter.getList()){
+                    for(Object item : todoAdapter.getItemList()){
                         ((Item)item).setPosition(position);
                         ((Item)item).setNoteId(listIdFromDb);
                         dao.addItem((Item)item);
@@ -440,15 +453,18 @@ public class ListEditActivity extends Activity {
                     }
                 }
             }
+            return true;
         } else if(deleteListAfterChanges || deleteListCalled) {
-            if(todoAdapter.getList().size() > 2){ //db call only if list is populated
+            if(todoAdapter.getItemList().size() > 2){ //db call only if list is populated
                 dao.deleteAllItems(list.getId());
             }
             if(list.getId() > 0){
                 dao.deleteNote(list.getId());
             }
+            return true;
         } else {
-            Toast.makeText(getApplicationContext(), "Changes not made", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "Changes not made", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 }
