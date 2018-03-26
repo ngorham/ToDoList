@@ -247,6 +247,8 @@ public class ListDetailActivity extends Activity {
                     dao.deleteAllItems(list.getId());
                 }
                 dao.deleteNote(list.getId());
+                Toast.makeText(getApplicationContext(), "Deleted",
+                        Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("changes", changes);

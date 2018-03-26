@@ -34,6 +34,7 @@ public class ListEditActivity extends Activity {
     //Private variables
     private Note list = new Note();
     private boolean changes = false;
+    private boolean savedCalled = false;
     private boolean deleteListCalled = false;
     private boolean deleteListAfterChanges = false;
     private ActionBar actionBar;
@@ -141,6 +142,30 @@ public class ListEditActivity extends Activity {
     }
 
     @Override
+    protected void onStart(){
+        super.onStart();
+        Log.d(TAG, "INSIDE: onStart");
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d(TAG, "INSIDE: onResume");
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        Log.d(TAG, "INSIDE: onPause");
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.d(TAG, "INSIDE: onStop");
+    }
+
+    @Override
     public void onDestroy(){
         super.onDestroy();
         Log.d(TAG, "INSIDE: onDestroy");
@@ -149,18 +174,13 @@ public class ListEditActivity extends Activity {
     }
 
     @Override
-    public void onResume(){
-        super.onResume();
-        Log.v("onResume", "items.count: " + todoAdapter.getItemList().size());
-    }
-
-    @Override
     public void onBackPressed(){
         Log.d(TAG, "INSIDE: onBackPressed");
         Log.d(TAG, "INSIDE: onBackPressed changes = " + changes);
-        updateDB();
+        Log.d(TAG, "INSIDE: onBackPressed savedCalled = " + savedCalled);
         Intent intent = new Intent();
-        intent.putExtra("changes", changes);
+        if(!savedCalled){ intent.putExtra("changes", updateDB()); }
+        else { intent.putExtra("changes", savedCalled); }
         intent.putExtra("NAME", list.getName());
         setResult(RESULT_OK, intent);
         super.onBackPressed();
@@ -204,28 +224,17 @@ public class ListEditActivity extends Activity {
     //Call when user clicks an item in action bar
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        //Handle action items
-        switch(item.getItemId()){
+        switch(item.getItemId()){ //Handle action items
             case R.id.delete_list:
                 deleteListDialog();
                 return true;
             case R.id.save_list:
-                Intent intent;
-                 if(updateDB()) {
-                     intent = new Intent(this, ListDetailActivity.class);
-                 } else {
-                     intent = new Intent(this, MainActivity.class);
-                 }
-                intent.putExtra(ListEditActivity.EXTRA_LIST_ID, list.getId());
-                intent.putExtra("changes", changes);
-                intent.putExtra("NAME", list.getName());
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                setResult(RESULT_OK, intent);
-                startActivityForResult(intent, 1);
-                finish();
+                if(updateDB()){
+                    changes = false;
+                    savedCalled = true;
+                }
                 return true;
-            case R.id.app_settings:
-                //Settings action
+            case R.id.app_settings: //Settings action
                 Toast.makeText(this, "Settings action", Toast.LENGTH_SHORT).show();
                 return true;
             default:
@@ -386,13 +395,17 @@ public class ListEditActivity extends Activity {
 
     //Updates db if changes are made
     private boolean updateDB(){
-        if(changes && !deleteListAfterChanges){
-            Toast.makeText(getApplicationContext(), "Saved",
-                    Toast.LENGTH_SHORT).show();
-            String newListName = listNameField.getText().toString();
+        String newListName = listNameField.getText().toString();
+        boolean listNameChange = !list.getName().equals(newListName);
+        Log.d(TAG, "INSIDE: updateDB listNameChange = " + listNameChange);
+        Log.d(TAG, "INSIDE: updateDB changes = " + changes);
+        if((changes || listNameChange) && !deleteListAfterChanges){
             if(newListName.equals("")){
                 newListName = getDateString();
             }
+            //Remove first and last Add Item objects
+            todoAdapter.getItemList().remove(0);
+            todoAdapter.getItemList().remove(todoAdapter.getItemList().size() - 1);
             if(list.getId() > 0){
                 //update list in db
                 list.setLastModified(getDateTime());
@@ -406,9 +419,6 @@ public class ListEditActivity extends Activity {
                 }
                 //Add new items, update old items
                 if(!todoAdapter.getItemList().isEmpty()){
-                    //Remove first and last AddItem objects
-                    todoAdapter.getItemList().remove(0);
-                    todoAdapter.getItemList().remove(todoAdapter.getItemList().size() - 1);
                     int position = 0;
                     for(Object item : todoAdapter.getItemList()){
                         ((Item)item).setPosition(position);
@@ -441,9 +451,6 @@ public class ListEditActivity extends Activity {
                 }
                 //Add new items
                 if(!todoAdapter.getItemList().isEmpty()){
-                    //Remove first and last AddItem objects
-                    todoAdapter.getItemList().remove(0);
-                    todoAdapter.getItemList().remove(todoAdapter.getItemList().size() - 1);
                     int position = 0;
                     for(Object item : todoAdapter.getItemList()){
                         ((Item)item).setPosition(position);
@@ -453,6 +460,9 @@ public class ListEditActivity extends Activity {
                     }
                 }
             }
+            Toast.makeText(getApplicationContext(), "Saved",
+                    Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "INSIDE: updateDB database changes saved");
             return true;
         } else if(deleteListAfterChanges || deleteListCalled) {
             if(todoAdapter.getItemList().size() > 2){ //db call only if list is populated
@@ -461,6 +471,9 @@ public class ListEditActivity extends Activity {
             if(list.getId() > 0){
                 dao.deleteNote(list.getId());
             }
+            Toast.makeText(getApplicationContext(), "Deleted",
+                    Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "INSIDE: updateDB database changes saved");
             return true;
         } else {
             //Toast.makeText(getApplicationContext(), "Changes not made", Toast.LENGTH_SHORT).show();

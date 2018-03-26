@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent(getApplicationContext(), ListDetailActivity.class);
                 intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, note.getId());
                 intent.putExtra("NAME", note.getName());
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
             @Override
             public void deleteItem(View v, int position){}
@@ -61,7 +61,7 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart(){
         super.onStart();
         Log.d(TAG, "INSIDE: onStart");
     }
@@ -73,19 +73,19 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause(){
         super.onPause();
         Log.d(TAG, "INSIDE: onPause");
     }
 
     @Override
-    protected void onStop() {
+    protected void onStop(){
         super.onStop();
         Log.d(TAG, "INSIDE: onStop");
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy(){
         super.onDestroy();
         Log.d(TAG, "INSIDE: onDestroy");
         dao.close();
@@ -104,7 +104,7 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
