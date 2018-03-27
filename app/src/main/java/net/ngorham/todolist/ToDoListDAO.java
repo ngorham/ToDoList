@@ -247,6 +247,34 @@ public class ToDoListDAO {
 
     }
 
+    //Get Item id by createdOn and lastModified times
+    public int fetchItemId(String createdOn){
+        int id = 0;
+        String[] columns = {"_id"};
+        String selection = "CREATED_ON = ? AND LAST_MODIFIED = ?";
+        String[] selectionArgs = {createdOn, createdOn};
+        try{
+            id = 0;
+            Cursor cursor = db.query("ITEM",
+                    columns,
+                    selection, selectionArgs,
+                    null, null, null);
+            if(cursor.moveToFirst()){
+                while(!cursor.isAfterLast()){
+                    id = cursor.getInt(0);
+                    cursor.moveToNext();
+                }
+                cursor.close();
+            }
+            return id;
+        } catch(SQLiteException e){
+            Toast.makeText(context,
+                    "Database unavailable, failed to fetch item from table",
+                    Toast.LENGTH_SHORT).show();
+            return id;
+        }
+    }
+
     //Get all Items from db where listId matches
     public ArrayList<Item> fetchAllItems(int listId){
         ArrayList<Item> items = new ArrayList<>();

@@ -114,6 +114,7 @@ public class ListEditActivity extends Activity {
                 if(id > 0) {
                     deletedItems.add(id);
                     changes = true;
+                    savedCalled = false;
                 } else {
                     changes = false;
                 }
@@ -291,8 +292,9 @@ public class ListEditActivity extends Activity {
                 }
                 Item newItem = new Item();
                 newItem.setName(addItemName);
-                newItem.setCreatedOn(getDateTime());
-                newItem.setLastModified(getDateTime());
+                String dateTime = getDateTime();
+                newItem.setCreatedOn(dateTime);
+                newItem.setLastModified(dateTime);
                 newItem.setNoteId(list.getId());
                 if(position == 0){
                     newPos = position + 1;
@@ -439,13 +441,21 @@ public class ListEditActivity extends Activity {
                     }
                 }
                 //Add new items, update old items
-                if(!todoAdapter.getItemList().isEmpty()){
+                if(todoAdapter.getItemCount() > 2){
                     int position = 0;
                     for(int i = 1; i < todoAdapter.getItemCount() - 1; i++){
-                        Item item = todoAdapter.getItemList().get(position);
+                        Item item = todoAdapter.getItemList().get(i);
                         item.setPosition(position);
                         if(item.getId() == 0){//add new item
                             dao.addItem(item);
+                            int newItemId = dao.fetchItemId(item.getCreatedOn());
+                            if(newItemId == 0){
+                                Toast.makeText(getApplicationContext(),
+                                        "Database unavailable, cannot access",
+                                        Toast.LENGTH_SHORT).show();
+                                return false;
+                            }
+                            item.setId(newItemId);
                         } else {
                             dao.updateItem(item);
                         }
@@ -474,13 +484,21 @@ public class ListEditActivity extends Activity {
                     }
                 }
                 //Add new items
-                if(!todoAdapter.getItemList().isEmpty()){
+                if(todoAdapter.getItemCount() > 2){
                     int position = 0;
                     for(int i = 1; i < todoAdapter.getItemCount() - 1; i++){
-                        Item item = todoAdapter.getItemList().get(position);
+                        Item item = todoAdapter.getItemList().get(i);
                         item.setPosition(position);
                         item.setNoteId(listIdFromDb);
                         dao.addItem(item);
+                        int newItemId = dao.fetchItemId(item.getCreatedOn());
+                        if(newItemId == 0){
+                            Toast.makeText(getApplicationContext(),
+                                    "Database unavailable, cannot access",
+                                    Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                        item.setId(newItemId);
                         position++;
                     }
                 }
