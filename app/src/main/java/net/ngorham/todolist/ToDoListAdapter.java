@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by NBG on 3/14/2018.
@@ -17,8 +17,8 @@ import java.util.List;
 public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     //Private variables
     private Listener listener;
-    private List<Item> items;
-    private List<Note> notes;
+    private ArrayList<Item> items;
+    private ArrayList<Note> notes;
     private int editType = 0;
     //Private constants
     private final int NOTE_TYPE = 0;
@@ -32,13 +32,13 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     //Constructor with List<Item>
-    public ToDoListAdapter(List<Item> items, int editType){
+    public ToDoListAdapter(ArrayList<Item> items, int editType){
         this.items = items;
         this.editType = editType;
     }
 
     //Constructor with List<Note>
-    public ToDoListAdapter(int editType, List<Note> notes){
+    public ToDoListAdapter(int editType, ArrayList<Note> notes){
         this.notes = notes;
         this.editType = editType;
     }
@@ -210,12 +210,12 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     //Replace current item list with new or updated item list
-    public void setItemList(List<Item> items){ this.items = items; }
+    public void setItemList(ArrayList<Item> items){ this.items = items; }
 
-    public void setNoteList(List<Note> notes){ this.notes = notes; }
+    public void setNoteList(ArrayList<Note> notes){ this.notes = notes; }
 
     //Return reference to List<Item> items
-    public List<Item> getItemList(){ return items; }
+    public ArrayList<Item> getItemList(){ return items; }
 
-    public List<Note> getNoteList(){ return  notes; }
+    public ArrayList<Note> getNoteList(){ return  notes; }
 }

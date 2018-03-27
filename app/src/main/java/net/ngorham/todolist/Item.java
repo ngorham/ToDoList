@@ -1,12 +1,13 @@
 package net.ngorham.todolist;
 
-import java.util.Date;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by NBG on 3/16/2018.
  */
 
-public class Item {
+public class Item implements Parcelable{
     //Private variables
     private int id;
     private int noteId;
@@ -30,6 +31,43 @@ public class Item {
         setStrike(strike);
         setPosition(position);
     }
+
+    private Item(Parcel in){
+        setId(in.readInt());
+        setName(in.readString());
+        setCreatedOn(in.readString());
+        setLastModified(in.readString());
+        setNoteId(in.readInt());
+        setStrike(in.readInt());
+        setPosition(in.readInt());
+    }
+    public int describeContents(){
+        return 0;
+    }
+
+    @Override
+    public String toString(){
+        return "";
+    }
+
+    public void writeToParcel(Parcel out, int flags){
+        out.writeInt(id);
+        out.writeString(name);
+        out.writeString(createdOn);
+        out.writeString(lastModified);
+        out.writeInt(noteId);
+        out.writeInt(strike);
+        out.writeInt(position);
+    }
+
+    public static final Parcelable.Creator<Item> CREATOR = new Parcelable.Creator<Item>(){
+        public Item createFromParcel(Parcel in){
+            return new Item(in);
+        }
+        public Item[] newArray(int size){
+            return new Item[size];
+        }
+    };
 
     public void setId(int id){
         this.id = id;

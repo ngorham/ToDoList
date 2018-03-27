@@ -23,29 +23,19 @@ public class Note {
         setLastModified(lastModified);
     }
 
-    public void setName(String name){
-        this.name = name;
-    }
+    public void setName(String name){ this.name = name; }
 
-    public void setId(int id){
-        this.id = id;
-    }
+    public void setId(int id){ this.id = id; }
 
-    public void setCreatedOn(String createdOn){
-        this.createdOn = createdOn;
-    }
+    public void setCreatedOn(String createdOn){ this.createdOn = createdOn; }
 
     public void setLastModified(String lastModified){
         this.lastModified = lastModified;
     }
 
-    public String getName(){
-        return name;
-    }
+    public String getName(){ return name; }
 
-    public int getId(){
-        return id;
-    }
+    public int getId(){ return id; }
 
     public String getCreatedOn(){ return createdOn; }
 

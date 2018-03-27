@@ -27,7 +27,6 @@ public class ListDetailActivity extends Activity {
 
     //Private variables
     private Note list = new Note();
-    private boolean changes = false;
     private Boolean listChanges = false;
     //Private constants
     private final String TAG = "ListDetailActivity"; //debug
@@ -241,9 +240,9 @@ public class ListDetailActivity extends Activity {
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                changes = true;
+                listChanges = true;
                 //Delete list
-                if(todoAdapter.getItemList().size() > 2){ //db call only if list is populated
+                if(!todoAdapter.getItemList().isEmpty()){ //db call only if list is populated
                     dao.deleteAllItems(list.getId());
                 }
                 dao.deleteNote(list.getId());
@@ -251,9 +250,7 @@ public class ListDetailActivity extends Activity {
                         Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("changes", changes);
-                setResult(RESULT_OK, intent);
-                startActivityForResult(intent, 1);
+                startActivity(intent);
                 finish();
             }
         });
@@ -261,7 +258,7 @@ public class ListDetailActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //cancel, return to activity
-                changes = false;
+                listChanges = false;
             }
         });
         builder.setCancelable(true);
