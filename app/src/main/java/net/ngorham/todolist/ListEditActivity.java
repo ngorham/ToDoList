@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -50,6 +51,136 @@ public class ListEditActivity extends Activity {
     private RecyclerView.LayoutManager todoLayoutManager;
     //Db variables
     private ToDoListDAO dao;
+
+    //Inner classes
+    //Update Note to db
+    private class UpdateNoteTask extends AsyncTask<Note, Void, Boolean> {
+        private Note note;
+        @Override
+        protected void onPreExecute(){}
+        @Override
+        protected Boolean doInBackground(Note... notes){
+            note = notes[0];
+            return dao.updateNote(note);
+        }
+        @Override
+        protected void onPostExecute(Boolean success){
+            Log.d(TAG, "INSIDE UpdateNoteTask onPostExecute success = " + success);
+            if(!success){
+                Toast.makeText(ListEditActivity.this,
+                        "Database unavailable, failed to update note in table",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    //Delete Note from db
+    private class DeleteNoteTask extends AsyncTask<Integer, Void, Boolean> {
+        @Override
+        protected void onPreExecute(){}
+        @Override
+        protected Boolean doInBackground(Integer... noteIds){
+            int noteId = noteIds[0];
+            return dao.deleteNote(noteId);
+        }
+        @Override
+        protected void onPostExecute(Boolean success){
+            Log.d(TAG, "INSIDE DeleteNoteTask onPostExecute success = " + success);
+            if(!success){
+                Toast.makeText(ListEditActivity.this,
+                        "Database unavailable, failed to delete note from table",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    //Add Item to db
+    private class AddItemTask extends AsyncTask<Item, Void, Integer> {
+        private Item item;
+        @Override
+        protected void onPreExecute(){}
+        @Override
+        protected Integer doInBackground(Item... items){
+            item = items[0];
+            if(dao.addItem(item)){
+                return dao.fetchItemId(item.getCreatedOn());
+            } else {
+                return 0;
+            }
+        }
+        @Override
+        protected void onPostExecute(Integer success){
+            Log.d(TAG, "INSIDE AddItemTask onPostExecute success = " + success);
+            if(success > 0) {
+                item.setId(success);
+            } else {
+                Toast.makeText(ListEditActivity.this,
+                        "Database unavailable, failed to insert item into table",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    //Update Item in db
+    private class UpdateItemTask extends AsyncTask<Item, Void, Boolean> {
+        private Item item;
+        @Override
+        protected void onPreExecute(){}
+        @Override
+        protected Boolean doInBackground(Item... items){
+            item = items[0];
+            return dao.updateItem(item);
+        }
+        @Override
+        protected void onPostExecute(Boolean success){
+            Log.d(TAG, "INSIDE UpdateItemTask onPostExecute success = " + success);
+            if(!success){
+                Toast.makeText(ListEditActivity.this,
+                        "Database unavailable, failed to update item in table",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    //Delete Item from db
+    private class DeleteItemTask extends AsyncTask<Integer, Void, Boolean> {
+        @Override
+        protected void onPreExecute(){}
+        @Override
+        protected Boolean doInBackground(Integer... itemIds){
+            int itemId = itemIds[0];
+            return dao.deleteItem(itemId);
+        }
+        @Override
+        protected void onPostExecute(Boolean success){
+            Log.d(TAG, "INSIDE DeleteItemTask onPostExecute success = " + success);
+            if(!success){
+                Toast.makeText(ListEditActivity.this,
+                        "Database unavailable, failed to delete item from table",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    //Delete all Items from db
+    private class DeleteAllItemsTask extends AsyncTask<Integer, Void, Boolean> {
+        @Override
+        protected void onPreExecute(){}
+        @Override
+        protected Boolean doInBackground(Integer... listIds){
+            int listId = listIds[0];
+            return dao.deleteAllItems(listId);
+        }
+        @Override
+        protected void onPostExecute(Boolean success){
+            Log.d(TAG, "INSIDE DeleteAllItemsTask onPostExecute success = " + success);
+            if(!success){
+                Toast.makeText(ListEditActivity.this,
+                        "Database unavailable, failed to delete all items from table",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -431,12 +562,12 @@ public class ListEditActivity extends Activity {
                 //update list in db
                 list.setLastModified(getDateTime());
                 list.setName(newListName);
-                dao.updateNote(list);
+                new UpdateNoteTask().execute(list);
                 //Remove items for db
                 if(!deletedItems.isEmpty()){
                     for(int i = 0; i < deletedItems.size(); i++){
                         int itemId = deletedItems.get(i);
-                        dao.deleteItem(itemId);
+                        new DeleteItemTask().execute(itemId);
                         deletedItems.remove(i);
                     }
                 }
@@ -447,17 +578,9 @@ public class ListEditActivity extends Activity {
                         Item item = todoAdapter.getItemList().get(i);
                         item.setPosition(position);
                         if(item.getId() == 0){//add new item
-                            dao.addItem(item);
-                            int newItemId = dao.fetchItemId(item.getCreatedOn());
-                            if(newItemId == 0){
-                                Toast.makeText(getApplicationContext(),
-                                        "Database unavailable, cannot access",
-                                        Toast.LENGTH_SHORT).show();
-                                return false;
-                            }
-                            item.setId(newItemId);
+                            new AddItemTask().execute(item);
                         } else {
-                            dao.updateItem(item);
+                            new UpdateItemTask().execute(item);
                         }
                         position++;
                     }
@@ -479,10 +602,11 @@ public class ListEditActivity extends Activity {
                 if(!deletedItems.isEmpty()){
                     for(int i = 0; i < deletedItems.size(); i++){
                         int itemId = deletedItems.get(i);
-                        dao.deleteItem(itemId);
+                        new DeleteItemTask().execute(itemId);
                         deletedItems.remove(i);
                     }
                 }
+                Log.d(TAG, "INSIDE: updateDB list id = " + list.getId());
                 //Add new items
                 if(todoAdapter.getItemCount() > 2){
                     int position = 0;
@@ -490,15 +614,7 @@ public class ListEditActivity extends Activity {
                         Item item = todoAdapter.getItemList().get(i);
                         item.setPosition(position);
                         item.setNoteId(listIdFromDb);
-                        dao.addItem(item);
-                        int newItemId = dao.fetchItemId(item.getCreatedOn());
-                        if(newItemId == 0){
-                            Toast.makeText(getApplicationContext(),
-                                    "Database unavailable, cannot access",
-                                    Toast.LENGTH_SHORT).show();
-                            return false;
-                        }
-                        item.setId(newItemId);
+                        new AddItemTask().execute(item);
                         position++;
                     }
                 }
@@ -509,10 +625,10 @@ public class ListEditActivity extends Activity {
             return true;
         } else if(deleteListAfterChanges || deleteListCalled) {
             if(todoAdapter.getItemCount() > 2 || !deletedItems.isEmpty()){
-                dao.deleteAllItems(list.getId());
+                new DeleteAllItemsTask().execute(list.getId());
             }
             if(list.getId() > 0){
-                dao.deleteNote(list.getId());
+                new DeleteNoteTask().execute(list.getId());
             }
             Toast.makeText(getApplicationContext(), "Deleted",
                     Toast.LENGTH_SHORT).show();

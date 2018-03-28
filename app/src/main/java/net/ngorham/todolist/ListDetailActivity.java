@@ -38,6 +38,26 @@ public class ListDetailActivity extends Activity {
     private ToDoListDAO dao;
 
     //Inner classes
+    //Delete Note from db
+    private class DeleteNoteTask extends AsyncTask<Integer, Void, Boolean> {
+        @Override
+        protected void onPreExecute(){}
+        @Override
+        protected Boolean doInBackground(Integer... noteIds){
+            int noteId = noteIds[0];
+            return dao.deleteNote(noteId);
+        }
+        @Override
+        protected void onPostExecute(Boolean success){
+            Log.d(TAG, "INSIDE DeleteNoteTask onPostExecute success = " + success);
+            if(!success){
+                Toast.makeText(ListDetailActivity.this,
+                        "Database unavailable, failed to delete note from table",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     //Update Item strike value
     private class UpdateItemStrikeTask extends AsyncTask<Item, Void, Boolean>{
         protected void onPreExecute(){}
@@ -49,6 +69,26 @@ public class ListDetailActivity extends Activity {
             if(!success){
                 Toast.makeText(ListDetailActivity.this,
                         "Database unavailable, failed to update strike in ITEM table",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    //Delete all Items from db
+    private class DeleteAllItemsTask extends AsyncTask<Integer, Void, Boolean> {
+        @Override
+        protected void onPreExecute(){}
+        @Override
+        protected Boolean doInBackground(Integer... listIds){
+            int listId = listIds[0];
+            return dao.deleteAllItems(listId);
+        }
+        @Override
+        protected void onPostExecute(Boolean success){
+            Log.d(TAG, "INSIDE DeleteAllItemsTask onPostExecute success = " + success);
+            if(!success){
+                Toast.makeText(ListDetailActivity.this,
+                        "Database unavailable, failed to delete all items from table",
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -243,9 +283,9 @@ public class ListDetailActivity extends Activity {
                 listChanges = true;
                 //Delete list
                 if(!todoAdapter.getItemList().isEmpty()){ //db call only if list is populated
-                    dao.deleteAllItems(list.getId());
+                    new DeleteAllItemsTask().execute(list.getId());
                 }
-                dao.deleteNote(list.getId());
+                new DeleteNoteTask().execute(list.getId());
                 Toast.makeText(getApplicationContext(), "Deleted",
                         Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
