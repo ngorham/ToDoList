@@ -275,7 +275,7 @@ public class ListDetailActivity extends Activity {
     private void deleteListDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(ListDetailActivity.this);
         builder.setTitle("Delete");
-        builder.setIcon(R.drawable.ic_warning_black_18dp);
+        builder.setIcon(R.drawable.ic_warning_gold_18dp);
         builder.setMessage("Are you sure you want to delete this list?");
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override

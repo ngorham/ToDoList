@@ -170,6 +170,10 @@ public class MainActivity extends Activity {
     //Called when invalidateOptionsMenu() is called
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
+        //MenuItem add_list = menu.findItem(R.id.add_list);
+        //if(add_list != null){
+        //    add_list.setIcon(getResources().getDrawable(R.drawable.ic_add_black_18dp));
+        //}
         return super.onPrepareOptionsMenu(menu);
     }
 }

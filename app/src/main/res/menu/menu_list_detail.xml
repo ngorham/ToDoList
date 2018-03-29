@@ -6,19 +6,19 @@
     <item
         android:id="@+id/edit_list"
         android:title="@string/edit_list"
-        android:icon="@drawable/ic_edit_black_18dp"
+        android:icon="@drawable/ic_edit_gold_18dp"
         android:orderInCategory="1"
         android:showAsAction="ifRoom" />
     <item
         android:id="@+id/delete_list"
         android:title="@string/delete_list"
-        android:icon="@drawable/ic_delete_black_18dp"
+        android:icon="@drawable/ic_delete_gold_18dp"
         android:orderInCategory="2"
         android:showAsAction="never|withText" />
     <item
         android:id="@+id/app_settings"
         android:title="@string/app_settings"
-        android:icon="@drawable/ic_settings_black_18dp"
+        android:icon="@drawable/ic_settings_gold_18dp"
         android:orderInCategory="100"
         android:showAsAction="never|withText" />
 </menu>
