@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class ToDoListDatabaseHelper extends SQLiteOpenHelper{
     //Private constants
     private static final String DB_NAME = "ToDoList";
-    private static final int DB_VERSION = 8;
+    private static final int DB_VERSION = 9;
     //Note Schema
     private final String NOTE_TABLE = "NOTE";
     private final String COLUMN_ID = "_id";
@@ -77,30 +77,6 @@ public class ToDoListDatabaseHelper extends SQLiteOpenHelper{
             db.execSQL("DROP TABLE IF EXISTS ITEM");
             db.execSQL(NOTE_TABLE_CREATE);
             db.execSQL(ITEM_TABLE_CREATE);
-            insertNote(db, "Test List 1", "Today", "Today");
-            insertNote(db, "Test List 2", "Today", "Today");
-            insertItem(db, "Test Item 1", 1);
-            insertItem(db, "Test Item 2", 1);
-            insertItem(db, "Test Item 3", 2);
-            insertItem(db, "Test Item 4", 2);
         }
-    }
-
-    //Insert Note info into NOTE table
-    private void insertNote(SQLiteDatabase db, String name, String created, String modified){
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_NAME, name);
-        values.put(COLUMN_CREATED_ON, created);
-        values.put(COLUMN_LAST_MODIFIED, modified);
-        db.insert(NOTE_TABLE, null, values);
-    }
-
-    //Insert Item info into Item table
-    private void insertItem(SQLiteDatabase db, String name, int listId){
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_NAME, name);
-        values.put(COLUMN_LIST_ID, listId);
-        values.put(COLUMN_POSITION, 0);
-        db.insert(ITEM_TABLE, null, values);
     }
 }

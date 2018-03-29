@@ -78,9 +78,10 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 holder.getNameLabel().setPaintFlags(0);
             }
             //SimpleDateFormat dateFormat =
-            //        new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            //String lastModifiedDate = dateFormat.format(item.getLastModified());
-            holder.getLastModifiedLabel().setText(String.valueOf(item.getId()));
+            //        new SimpleDateFormat("MMM dd", Locale.getDefault());
+            //Date date = new Date(
+            String lastModifiedDate = getMonthDay(item.getLastModified());
+            holder.getLastModifiedLabel().setText(lastModifiedDate);
         }
         holder.getNameLabel().setOnClickListener(new View.OnClickListener(){
             @Override
@@ -99,7 +100,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if(item != null){
             holder.getTextLabel().setText(item.getName());
         }
-        holder.getTextLabel().setOnClickListener(new View.OnClickListener(){
+        holder.getParent().setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 if(listener != null) {
@@ -225,4 +226,37 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public ArrayList<Item> getItemList(){ return items; }
 
     public ArrayList<Note> getNoteList(){ return  notes; }
+
+    //Utility for displaying Month and Day of item's lastModified
+    private String getMonthDay(String date){
+        String month = "";
+        String monthSubstr = date.substring(5, 7);
+        String day = date.substring(8, 10);
+        if(monthSubstr.equals("01")){
+            month = "Jan";
+        } else if(monthSubstr.equals("02")){
+            month = "Feb";
+        } else if(monthSubstr.equals("03")){
+            month = "Mar";
+        } else if(monthSubstr.equals("04")){
+            month = "Apr";
+        } else if(monthSubstr.equals("05")){
+            month = "May";
+        } else if(monthSubstr.equals("06")){
+            month = "Jun";
+        } else if(monthSubstr.equals("07")){
+            month = "Jul";
+        } else if(monthSubstr.equals("08")){
+            month = "Aug";
+        } else if(monthSubstr.equals("09")){
+            month = "Sep";
+        } else if(monthSubstr.equals("10")){
+            month = "Oct";
+        } else if(monthSubstr.equals("11")){
+            month = "Nov";
+        } else if(monthSubstr.equals("12")){
+            month = "Dec";
+        }
+        return (month + " " + day);
+    }
 }

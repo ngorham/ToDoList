@@ -10,13 +10,18 @@ import android.widget.TextView;
 
 public class AddItemViewHolder extends RecyclerView.ViewHolder {
     //Private variables
+    private View parent;
     private TextView textLabel;
 
     //Constructor
     public AddItemViewHolder(View v){
         super(v);
+        this.parent = v;
         this.textLabel = v.findViewById(R.id.add_item_text);
     }
+
+    //Return reference to View parent
+    public View getParent(){ return parent; }
 
     //Return reference of TextView textLabel
     public TextView getTextLabel(){ return textLabel; }
