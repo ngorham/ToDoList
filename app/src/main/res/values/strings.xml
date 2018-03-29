@@ -8,4 +8,7 @@
     <string name="text_field">Editable Text</string>
     <string name="add_item">Add Item</string>
     <string name="edit_item">Edit Item</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -2,8 +2,11 @@ package net.ngorham.todolist;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -25,9 +28,18 @@ public class MainActivity extends Activity {
     private RecyclerView.LayoutManager todoLayoutManager;
     //Db variables
     private ToDoListDAO dao;
+    private SharedPreferences sharedPrefs;
+    private boolean switchTheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        switchTheme = sharedPrefs.getBoolean("switch_theme", false);
+        if(switchTheme){ //Light Theme
+            setTheme(R.style.AppTheme);
+        } else { //Dark Theme
+            setTheme(R.style.DarkTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Set up recycler view
@@ -111,6 +123,8 @@ public class MainActivity extends Activity {
                 listChanges = data.getExtras().getBoolean("changes");
                 Log.d(TAG, "INSIDE: onActivityResult: changes " + listChanges);
             }
+        } else if(requestCode == 2){
+            showSettings();
         }
     }
 
@@ -153,14 +167,17 @@ public class MainActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         //Handle action items
+        Intent intent;
         switch(item.getItemId()){
             case R.id.add_list: //Add list action
-                Intent intent = new Intent(this, ListEditActivity.class);
+                intent = new Intent(this, ListEditActivity.class);
                 intent.putExtra(ListEditActivity.EXTRA_LIST_ID, 0);
                 startActivityForResult(intent, 1);
                 return true;
             case R.id.app_settings: //Settings action
                 Toast.makeText(this, "Settings action", Toast.LENGTH_SHORT).show();
+                intent = new Intent(this, SettingsActivity.class);
+                startActivityForResult(intent, 2);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -175,5 +192,11 @@ public class MainActivity extends Activity {
         //    add_list.setIcon(getResources().getDrawable(R.drawable.ic_add_black_18dp));
         //}
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void showSettings(){
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean switchTheme = sharedPrefs.getBoolean("switch_theme", false);
+        Toast.makeText(this, "Switch Theme results: " + switchTheme, Toast.LENGTH_SHORT).show();
     }
 }
