@@ -8,9 +8,7 @@
             android:defaultValue="false"
             android:key="switch_theme"
             android:title="Theme Selector"
-            android:summaryOff="Off Theme summary"
-            android:summaryOn="On Theme summary"
-            android:switchTextOff="Dark Theme"
-            android:switchTextOn="Light Theme" />
+            android:summaryOff="Dark Theme"
+            android:summaryOn="Light Theme" />
     </PreferenceCategory>
 </PreferenceScreen>

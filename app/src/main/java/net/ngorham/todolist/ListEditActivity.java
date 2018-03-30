@@ -5,10 +5,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -51,6 +53,9 @@ public class ListEditActivity extends Activity {
     private RecyclerView.LayoutManager todoLayoutManager;
     //Db variables
     private ToDoListDAO dao;
+    //SharedPreferences variables
+    private SharedPreferences sharedPrefs;
+    private boolean switchTheme;
 
     //Inner classes
     //Update Note to db
@@ -183,7 +188,14 @@ public class ListEditActivity extends Activity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        switchTheme = sharedPrefs.getBoolean("switch_theme", false);
+        if(switchTheme){ //Light Theme
+            setTheme(R.style.AppTheme);
+        } else { //Dark Theme
+            setTheme(R.style.DarkTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_edit);
         //Set up recycler view
@@ -330,6 +342,17 @@ public class ListEditActivity extends Activity {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "INSIDE: onActivityResult");
+        if(requestCode == 2){
+            Log.d(TAG, "INSIDE: onActivityResult: Came from Settings");
+            finish();
+            startActivity(getIntent());
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState){
         String newListName = listNameField.getText().toString();
         listNameChange = !oldListName.equals(newListName);
@@ -377,6 +400,7 @@ public class ListEditActivity extends Activity {
     //Call when user clicks an item in action bar
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
+        Intent intent;
         switch(item.getItemId()){ //Handle action items
             case R.id.delete_list:
                 deleteListDialog();
@@ -389,6 +413,8 @@ public class ListEditActivity extends Activity {
                 return true;
             case R.id.app_settings: //Settings action
                 Toast.makeText(this, "Settings action", Toast.LENGTH_SHORT).show();
+                intent = new Intent(this, SettingsActivity.class);
+                startActivityForResult(intent, 2);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -398,6 +424,30 @@ public class ListEditActivity extends Activity {
     //Called when invalidateOptionsMenu() is called
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
+        MenuItem delete_list = menu.findItem(R.id.delete_list);
+        MenuItem save_list = menu.findItem(R.id.save_list);
+        MenuItem app_settings = menu.findItem(R.id.app_settings);
+        if(switchTheme){ //Light Theme
+            if(delete_list != null){
+                delete_list.setIcon(getResources().getDrawable(R.drawable.ic_delete_black_18dp));
+            }
+            if(save_list != null){
+                save_list.setIcon(getResources().getDrawable(R.drawable.ic_save_black_18dp));
+            }
+            if(app_settings != null){
+                app_settings.setIcon(getResources().getDrawable(R.drawable.ic_settings_black_18dp));
+            }
+        } else { //Dark Theme
+            if(delete_list != null){
+                delete_list.setIcon(getResources().getDrawable(R.drawable.ic_delete_gold_18dp));
+            }
+            if(save_list != null){
+                save_list.setIcon(getResources().getDrawable(R.drawable.ic_save_gold_18dp));
+            }
+            if(app_settings != null){
+                app_settings.setIcon(getResources().getDrawable(R.drawable.ic_settings_gold_18dp));
+            }
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -505,7 +555,11 @@ public class ListEditActivity extends Activity {
     private void deleteListDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(ListEditActivity.this);
         builder.setTitle("Delete");
-        builder.setIcon(R.drawable.ic_warning_gold_18dp);
+        if(switchTheme){
+            builder.setIcon(R.drawable.ic_warning_black_18dp);
+        } else {
+            builder.setIcon(R.drawable.ic_warning_gold_18dp);
+        }
         builder.setMessage("Are you sure you want to delete this list?");
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override

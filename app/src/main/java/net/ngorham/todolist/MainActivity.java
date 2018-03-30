@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -28,6 +27,7 @@ public class MainActivity extends Activity {
     private RecyclerView.LayoutManager todoLayoutManager;
     //Db variables
     private ToDoListDAO dao;
+    //SharedPreferences variables
     private SharedPreferences sharedPrefs;
     private boolean switchTheme;
 
@@ -118,13 +118,18 @@ public class MainActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "INSIDE: onActivityResult");
         if (requestCode == 1) {
+            Log.d(TAG, "INSIDE: onActivityResult: requestCode = 1");
             if(resultCode == RESULT_OK) {
                 listChanges = data.getExtras().getBoolean("changes");
                 Log.d(TAG, "INSIDE: onActivityResult: changes " + listChanges);
             }
         } else if(requestCode == 2){
-            showSettings();
+            Log.d(TAG, "INSIDE: onActivityResult: requestCode = 2");
+            Log.d(TAG, "INSIDE: onActivityResult: Came from SettingsActivity");
+            finish();
+            startActivity(getIntent());
         }
     }
 
@@ -166,9 +171,8 @@ public class MainActivity extends Activity {
     //Call when user clicks an item in action bar
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        //Handle action items
         Intent intent;
-        switch(item.getItemId()){
+        switch(item.getItemId()){ //Handle action items
             case R.id.add_list: //Add list action
                 intent = new Intent(this, ListEditActivity.class);
                 intent.putExtra(ListEditActivity.EXTRA_LIST_ID, 0);
@@ -187,10 +191,23 @@ public class MainActivity extends Activity {
     //Called when invalidateOptionsMenu() is called
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
-        //MenuItem add_list = menu.findItem(R.id.add_list);
-        //if(add_list != null){
-        //    add_list.setIcon(getResources().getDrawable(R.drawable.ic_add_black_18dp));
-        //}
+        MenuItem add_list = menu.findItem(R.id.add_list);
+        MenuItem app_settings = menu.findItem(R.id.app_settings);
+        if(switchTheme){ //Light Theme
+            if(add_list != null){
+                add_list.setIcon(getResources().getDrawable(R.drawable.ic_add_black_18dp));
+            }
+            if(app_settings != null){
+                app_settings.setIcon(getResources().getDrawable(R.drawable.ic_settings_black_18dp));
+            }
+        } else { //Dark Theme
+            if(add_list != null){
+                add_list.setIcon(getResources().getDrawable(R.drawable.ic_add_gold_18dp));
+            }
+            if(app_settings != null){
+                app_settings.setIcon(getResources().getDrawable(R.drawable.ic_settings_gold_18dp));
+            }
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
