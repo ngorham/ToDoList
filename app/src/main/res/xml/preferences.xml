@@ -8,7 +8,9 @@
             android:key="switch_theme"
             android:title="@string/switch_theme_title"
             android:summaryOff="@string/switch_theme_summary_off"
-            android:summaryOn="@string/switch_theme_summary_on" />
+            android:summaryOn="@string/switch_theme_summary_on"
+            android:switchTextOff="Dark"
+            android:switchTextOn="Light" />
     </PreferenceCategory>
     <PreferenceCategory
         android:title="About"

@@ -2,19 +2,16 @@
     <!-- Base application theme. -->
     <style name="LightTheme" parent="android:Theme.Material.Light">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorPrimary">@color/colorPrimaryLight</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDarkLight</item>
+        <item name="android:colorAccent">@color/colorAccentLight</item>
+        <item name="android:textColorPrimary">@color/textPrimaryLight</item>
+        <item name="android:textColorSecondary">@color/textSecondary</item>
     </style>
     <style name="DarkTheme" parent="android:Theme.Material">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorAccent">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@color/textPrimary</item>
+        <item name="android:colorPrimary">@color/colorPrimaryDark</item>
+        <item name="android:colorAccent">@color/colorAccentDark</item>
+        <item name="android:textColorPrimary">@color/textPrimaryDark</item>
         <item name="android:windowBackground">@color/windowBackground</item>
     </style>
-    <!-- Custom Action Bar -->
-    <style name="CustomActionBar" parent="">
-
-    </style>
-
 </resources>
