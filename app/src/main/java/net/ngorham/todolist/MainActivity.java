@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import java.lang.reflect.Method;
 
@@ -35,11 +34,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         switchTheme = sharedPrefs.getBoolean("switch_theme", false);
-        if(switchTheme){ //Light Theme
-            setTheme(R.style.AppTheme);
-        } else { //Dark Theme
-            setTheme(R.style.DarkTheme);
-        }
+        if(switchTheme){ setTheme(R.style.LightTheme); }
+        else { setTheme(R.style.DarkTheme); }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Set up recycler view
@@ -107,7 +103,10 @@ public class MainActivity extends Activity {
     protected void onRestart(){
         super.onRestart();
         Log.d(TAG, "INSIDE: onRestart");
-        Log.d(TAG, "INSIDE: onRestart: changes " + listChanges);
+        if(switchTheme != sharedPrefs.getBoolean("switch_theme", false)){
+            finish();
+            startActivity(getIntent());
+        }
         if(listChanges){
             todoAdapter.setNoteList(dao.fetchAllNotes());
             todoAdapter.notifyDataSetChanged();
@@ -123,7 +122,6 @@ public class MainActivity extends Activity {
             Log.d(TAG, "INSIDE: onActivityResult: requestCode = 1");
             if(resultCode == RESULT_OK) {
                 listChanges = data.getExtras().getBoolean("changes");
-                Log.d(TAG, "INSIDE: onActivityResult: changes " + listChanges);
             }
         } else if(requestCode == 2){
             Log.d(TAG, "INSIDE: onActivityResult: requestCode = 2");
@@ -176,10 +174,10 @@ public class MainActivity extends Activity {
             case R.id.add_list: //Add list action
                 intent = new Intent(this, ListEditActivity.class);
                 intent.putExtra(ListEditActivity.EXTRA_LIST_ID, 0);
+                intent.putExtra("NAME", "");
                 startActivityForResult(intent, 1);
                 return true;
             case R.id.app_settings: //Settings action
-                Toast.makeText(this, "Settings action", Toast.LENGTH_SHORT).show();
                 intent = new Intent(this, SettingsActivity.class);
                 startActivityForResult(intent, 2);
                 return true;
@@ -209,11 +207,5 @@ public class MainActivity extends Activity {
             }
         }
         return super.onPrepareOptionsMenu(menu);
-    }
-
-    private void showSettings(){
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean switchTheme = sharedPrefs.getBoolean("switch_theme", false);
-        Toast.makeText(this, "Switch Theme results: " + switchTheme, Toast.LENGTH_SHORT).show();
     }
 }

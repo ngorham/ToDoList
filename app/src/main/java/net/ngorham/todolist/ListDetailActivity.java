@@ -103,11 +103,8 @@ public class ListDetailActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState){
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         switchTheme = sharedPrefs.getBoolean("switch_theme", false);
-        if(switchTheme){ //Light Theme
-            setTheme(R.style.AppTheme);
-        } else { //Dark Theme
-            setTheme(R.style.DarkTheme);
-        }
+        if(switchTheme){ setTheme(R.style.LightTheme); }
+        else { setTheme(R.style.DarkTheme); }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_detail);
         //Set up recycler view
@@ -194,7 +191,10 @@ public class ListDetailActivity extends Activity {
     protected void onRestart(){
         super.onRestart();
         Log.d(TAG, "INSIDE: onRestart");
-        Log.d(TAG, "INSIDE: onRestart: changes " + listChanges);
+        if(switchTheme != sharedPrefs.getBoolean("switch_theme", false)){
+            finish();
+            startActivity(getIntent());
+        }
         if(listChanges){
             getActionBar().setTitle(list.getName());
             todoAdapter.setItemList(dao.fetchAllItems(list.getId()));
@@ -213,7 +213,6 @@ public class ListDetailActivity extends Activity {
                 if(!list.getName().equals(newListName)){
                     list.setName(newListName);
                 }
-                Log.d(TAG, "INSIDE: onActivityResult: changes " + listChanges);
             }
         } else if(requestCode == 2){
             Log.d(TAG, "INSIDE: onActivityResult: Came from SettingsActivity");
@@ -224,7 +223,6 @@ public class ListDetailActivity extends Activity {
     @Override
     public void onBackPressed(){
         Log.d(TAG, "INSIDE: onBackPressed");
-        Log.d(TAG, "INSIDE: onBackPressed changes = " + listChanges);
         Intent intent = new Intent();
         intent.putExtra("changes", listChanges);
         setResult(RESULT_OK, intent);
@@ -281,7 +279,6 @@ public class ListDetailActivity extends Activity {
                 deleteListDialog();
                 return true;
             case R.id.app_settings: //Settings action
-                Toast.makeText(this, "Settings action", Toast.LENGTH_SHORT).show();
                 intent = new Intent(this, SettingsActivity.class);
                 startActivityForResult(intent, 2);
                 return true;

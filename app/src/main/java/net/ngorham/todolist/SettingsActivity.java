@@ -14,11 +14,8 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         switchTheme = sharedPrefs.getBoolean("switch_theme", false);
-        if(switchTheme){ //Light Theme
-            setTheme(R.style.AppTheme);
-        } else { //Dark Theme
-            setTheme(R.style.DarkTheme);
-        }
+        if(switchTheme){ setTheme(R.style.LightTheme); }
+        else { setTheme(R.style.DarkTheme); }
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 

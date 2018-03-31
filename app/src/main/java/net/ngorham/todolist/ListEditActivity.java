@@ -46,7 +46,7 @@ public class ListEditActivity extends Activity {
     private ArrayList<Integer> deletedItems = new ArrayList<>();
     private ArrayList<Item> items;
     //Private constants
-    private final String TAG = "ListEditActivity";
+    private final String TAG = "ListEditActivity"; //debug
     //Recycler View variables
     private RecyclerView todoRecycler;
     private ToDoListAdapter todoAdapter;
@@ -191,11 +191,8 @@ public class ListEditActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState){
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         switchTheme = sharedPrefs.getBoolean("switch_theme", false);
-        if(switchTheme){ //Light Theme
-            setTheme(R.style.AppTheme);
-        } else { //Dark Theme
-            setTheme(R.style.DarkTheme);
-        }
+        if(switchTheme){ setTheme(R.style.LightTheme); }
+        else { setTheme(R.style.DarkTheme); }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_edit);
         //Set up recycler view
@@ -205,11 +202,9 @@ public class ListEditActivity extends Activity {
         todoRecycler.setLayoutManager(todoLayoutManager);
         //Set up DAO
         dao = new ToDoListDAO(this);
-        int listId;
-        String listName;
         if(savedInstanceState != null){ //existing instance
-            listId = savedInstanceState.getInt("listId");
-            listName = savedInstanceState.getString("listName");
+            list.setId(savedInstanceState.getInt("listId"));
+            list.setName(savedInstanceState.getString("listName"));
             oldListName = savedInstanceState.getString("oldListName");
             items = savedInstanceState.getParcelableArrayList("items");
             deletedItems = savedInstanceState.getIntegerArrayList("deletedItems");
@@ -217,26 +212,35 @@ public class ListEditActivity extends Activity {
             listNameChange = savedInstanceState.getBoolean("listNameChange");
             savedCalled = savedInstanceState.getBoolean("savedCalled");
         } else { //new instance
-            listId = (int)getIntent().getExtras().get(EXTRA_LIST_ID);
-            if(listId > 0) { //Edit existing list
-                listName = getIntent().getStringExtra("NAME");
-                //DB call and close
-                items = dao.fetchAllItems(listId);
-            } else { //Create new list
-                items = new ArrayList<>();
-                listName = "";
+            Bundle bundle = getIntent().getExtras();
+            if(bundle.getString("NAME") != null){ //New or existing list
+                list.setId((int)getIntent().getExtras().get(EXTRA_LIST_ID));
+                if(list.getId() > 0) { //Edit existing list
+                    list.setName(getIntent().getStringExtra("NAME"));
+                    //DB call and close
+                    items = dao.fetchAllItems(list.getId());
+                } else { //Create new list
+                    items = new ArrayList<>();
+                }
+                //Add AddItem options to top and bottom of recyclerView
+                Item front = new Item();
+                front.setName("Add Item");
+                Item back = new Item();
+                back.setName("Add Item");
+                items.add(0, front);
+                items.add(items.size(), back);
+                oldListName = list.getName();
+            } else { //Existing instance, came from Settings
+                list.setId(bundle.getInt("listId"));
+                list.setName(bundle.getString("listName"));
+                oldListName = bundle.getString("oldListName");
+                items = bundle.getParcelableArrayList("items");
+                deletedItems = bundle.getIntegerArrayList("deletedItems");
+                changes = bundle.getBoolean("changes");
+                listNameChange = bundle.getBoolean("listNameChange");
+                savedCalled = bundle.getBoolean("savedCalled");
             }
-            //Add AddItem options to top and bottom of recyclerView
-            Item front = new Item();
-            front.setName("Add Item");
-            Item back = new Item();
-            back.setName("Add Item");
-            items.add(0, front);
-            items.add(items.size(), back);
-            oldListName = listName;
         }
-        list.setName(listName);
-        list.setId(listId);
         //Create Adapter
         todoAdapter = new ToDoListAdapter(items, 1);
         //Set Adapter
@@ -347,8 +351,11 @@ public class ListEditActivity extends Activity {
         Log.d(TAG, "INSIDE: onActivityResult");
         if(requestCode == 2){
             Log.d(TAG, "INSIDE: onActivityResult: Came from Settings");
+            Bundle outState = toBundle();
+            Intent intent = new Intent(this, ListEditActivity.class);
+            intent.putExtras(outState);
             finish();
-            startActivity(getIntent());
+            startActivity(intent);
         }
     }
 
@@ -402,17 +409,16 @@ public class ListEditActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item){
         Intent intent;
         switch(item.getItemId()){ //Handle action items
-            case R.id.delete_list:
+            case R.id.delete_list: //delete list action
                 deleteListDialog();
                 return true;
-            case R.id.save_list:
+            case R.id.save_list: //save list action
                 if(updateDB()){
                     changes = false;
                     savedCalled = true;
                 }
                 return true;
             case R.id.app_settings: //Settings action
-                Toast.makeText(this, "Settings action", Toast.LENGTH_SHORT).show();
                 intent = new Intent(this, SettingsActivity.class);
                 startActivityForResult(intent, 2);
                 return true;
@@ -660,7 +666,6 @@ public class ListEditActivity extends Activity {
                         deletedItems.remove(i);
                     }
                 }
-                Log.d(TAG, "INSIDE: updateDB list id = " + list.getId());
                 //Add new items
                 if(todoAdapter.getItemCount() > 2){
                     int position = 0;
@@ -691,5 +696,21 @@ public class ListEditActivity extends Activity {
         } else {
             return false;
         }
+    }
+
+    //Store activity variables in a bundle
+    private Bundle toBundle(){
+        Bundle b = new Bundle();
+        String newListName = listNameField.getText().toString();
+        listNameChange = !oldListName.equals(newListName);
+        b.putInt("listId", list.getId());
+        b.putCharSequence("listName", newListName);
+        b.putCharSequence("oldListName", oldListName);
+        b.putParcelableArrayList("items", todoAdapter.getItemList());
+        b.putIntegerArrayList("deletedItems", deletedItems);
+        b.putBoolean("changes", changes);
+        b.putBoolean("listNameChange", listNameChange);
+        b.putBoolean("savedCalled", savedCalled);
+        return b;
     }
 }
