@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
     <PreferenceCategory
         android:title="General"
         android:key="general_category">
         <SwitchPreference
             android:defaultValue="false"
             android:key="switch_theme"
-            android:title="Theme Selector"
-            android:summaryOff="Dark Theme"
-            android:summaryOn="Light Theme" />
+            android:title="@string/switch_theme_title"
+            android:summaryOff="@string/switch_theme_summary_off"
+            android:summaryOn="@string/switch_theme_summary_on" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="About"
+        android:key="about_category">
+        <Preference
+            android:key="app_version"
+            android:title="@string/app_version_title"
+            android:summary="@string/app_version_summary"
+            android:selectable="false" />
+        <Preference
+            android:key="author"
+            android:title="@string/author_title"
+            android:summary="@string/author_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/website"/>
+        </Preference>
     </PreferenceCategory>
 </PreferenceScreen>
