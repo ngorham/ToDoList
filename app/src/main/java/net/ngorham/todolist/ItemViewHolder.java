@@ -5,9 +5,13 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * Created by NBG on 3/16/2018.
+ * To Do List
+ * ItemViewHolder.java
+ * Purpose: Provides access to RecyclerView.ViewHolder for Item option
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/16/2018
  */
-
 public class ItemViewHolder extends RecyclerView.ViewHolder {
     //Private variables
     private TextView nameLabel;
@@ -25,9 +29,4 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
 
     //Return reference of TextView lastModifiedLabel
     public TextView getLastModifiedLabel(){ return lastModifiedLabel; }
-
-    //Set reference of TextView nameLabel
-    public void setNameLabel(TextView nameLabel){
-        this.nameLabel = nameLabel;
-    }
 }

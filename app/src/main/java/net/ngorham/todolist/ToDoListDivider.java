@@ -7,7 +7,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 /**
- * Created by Admin on 3/18/2018.
+ * To Do List
+ * ToDoListDivider.java
+ * Purpose: Displays a rectangular divider between list items in a RecyclerView
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/14/2018
  */
 
 public class ToDoListDivider extends RecyclerView.ItemDecoration {

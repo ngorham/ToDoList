@@ -5,15 +5,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
-
 
 /**
- * Created by NBG on 3/14/2018.
+ * To Do List
+ * ToDoListDAO.java
+ * Purpose: Database Access Object, provides access to local SQLiteDatabase
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/14/2018
  */
 
 public class ToDoListDAO {
@@ -113,34 +115,6 @@ public class ToDoListDAO {
                     "Database unavailable, failed to fetch item from table",
                     Toast.LENGTH_SHORT).show();
             return id;
-        }
-    }
-
-    //Get Note by id
-    public Note fetchNoteById(int noteId){
-        Note note = new Note();
-        String selection = "_id = ?";
-        String[] selectionArgs = {String.valueOf(noteId)};
-        String[] columns = {"_id", "NAME"};
-        try {
-            Cursor cursor = db.query("NOTE",
-                    columns,
-                    selection, selectionArgs,
-                    null, null, "_id");
-            if(cursor.moveToFirst()){
-                while(!cursor.isAfterLast()){
-                    note.setId(cursor.getInt(0));
-                    note.setName(cursor.getString(1));
-                    cursor.moveToNext();
-                }
-                cursor.close();
-            }
-            return note;
-        } catch (SQLiteException e){
-            Toast.makeText(context,
-                    "Database unavailable, failed to fetch item from table",
-                    Toast.LENGTH_SHORT).show();
-            return null;
         }
     }
 

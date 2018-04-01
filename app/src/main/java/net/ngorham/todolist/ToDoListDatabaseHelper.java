@@ -1,12 +1,16 @@
 package net.ngorham.todolist;
 
 import android.content.Context;
-import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * Created by NBG on 3/10/2018.
+ * To Do List
+ * ToDoListDatabaseHelper.java
+ * Purpose: Builds SQLiteDatabase for long term storage
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/10/2018
  */
 
 public class ToDoListDatabaseHelper extends SQLiteOpenHelper{
@@ -46,7 +50,6 @@ public class ToDoListDatabaseHelper extends SQLiteOpenHelper{
             + COLUMN_STRIKE + " NUMERIC, "
             + COLUMN_POSITION + " INTEGER"
             + ");";
-
 
     //Default constructor
     ToDoListDatabaseHelper(Context context){

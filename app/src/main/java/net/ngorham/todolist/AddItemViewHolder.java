@@ -5,7 +5,12 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * Created by NBG on 3/19/2018.
+ * To Do List
+ * AddItemViewHolder.java
+ * Purpose: Provides access to RecyclerView.ViewHolder for Add Item option
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/19/2018
  */
 
 public class AddItemViewHolder extends RecyclerView.ViewHolder {

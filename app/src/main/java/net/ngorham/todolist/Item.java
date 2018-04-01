@@ -4,7 +4,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by NBG on 3/16/2018.
+ * To Do List
+ * Item.java
+ * Purpose: Provides local storage and access of a list Item
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/16/2018
  */
 
 public class Item implements Parcelable{
@@ -41,14 +46,11 @@ public class Item implements Parcelable{
         setStrike(in.readInt());
         setPosition(in.readInt());
     }
-    public int describeContents(){
-        return 0;
-    }
+
+    public int describeContents(){ return 0; }
 
     @Override
-    public String toString(){
-        return "";
-    }
+    public String toString(){ return ""; }
 
     public void writeToParcel(Parcel out, int flags){
         out.writeInt(id);
@@ -69,33 +71,21 @@ public class Item implements Parcelable{
         }
     };
 
-    public void setId(int id){
-        this.id = id;
-    }
+    public void setId(int id){ this.id = id; }
 
-    public void setName(String name){
-        this.name = name;
-    }
+    public void setName(String name){ this.name = name; }
 
-    public void setCreatedOn(String createdOn){
-        this.createdOn = createdOn;
-    }
+    public void setCreatedOn(String createdOn){ this.createdOn = createdOn; }
 
     public void setLastModified(String lastModified){
         this.lastModified = lastModified;
     }
 
-    public void setNoteId(int noteId){
-        this.noteId = noteId;
-    }
+    public void setNoteId(int noteId){ this.noteId = noteId; }
 
-    public void setStrike(int strike){
-        this.strike = strike;
-    }
+    public void setStrike(int strike){ this.strike = strike; }
 
-    public void setPosition(int position){
-        this.position = position;
-    }
+    public void setPosition(int position){ this.position = position; }
 
     public int getId(){ return id; }
 

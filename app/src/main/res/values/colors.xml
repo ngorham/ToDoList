@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorDivider">#424242</color>
     <!-- Dark Theme -->
     <color name="colorPrimaryDark">#212121</color>
     <color name="colorPrimaryDarkDark">#000</color>
@@ -8,9 +9,6 @@
     <color name="textPrimaryDark">#FFB74D</color>
     <color name="textSecondaryDark">#FFF</color>
     <color name="textTertiaryDark">#5E35B1</color>
-
-    <color name="colorDivider">#424242</color>
-
     <!-- Light Theme -->
     <color name="colorPrimaryLight">#efefef</color>
     <color name="colorPrimaryDarkLight">#000</color>

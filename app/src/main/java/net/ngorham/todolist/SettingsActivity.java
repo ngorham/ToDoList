@@ -5,6 +5,16 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
+/**
+ * To Do List
+ * SettingsActivity.java
+ * Detail/Edit
+ * Purpose: Provides access to SharedPreferences
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/29/2018
+ */
+
 public class SettingsActivity extends PreferenceActivity {
 
     @Override

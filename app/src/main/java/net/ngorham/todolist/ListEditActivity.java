@@ -29,6 +29,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * To Do List
+ * ListEditActivity.java
+ * Detail/Edit
+ * Purpose: Displays the name of the selected list and item contents,
+ * and provides list manipulation options
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/19/2018
+ */
+
 public class ListEditActivity extends Activity {
     //Public constants
     public static final String EXTRA_LIST_ID = "id";
@@ -45,8 +56,6 @@ public class ListEditActivity extends Activity {
     private String oldListName;
     private ArrayList<Integer> deletedItems = new ArrayList<>();
     private ArrayList<Item> items;
-    //Private constants
-    private final String TAG = "ListEditActivity"; //debug
     //Recycler View variables
     private RecyclerView todoRecycler;
     private ToDoListAdapter todoAdapter;
@@ -70,7 +79,6 @@ public class ListEditActivity extends Activity {
         }
         @Override
         protected void onPostExecute(Boolean success){
-            Log.d(TAG, "INSIDE UpdateNoteTask onPostExecute success = " + success);
             if(!success){
                 Toast.makeText(ListEditActivity.this,
                         "Database unavailable, failed to update note in table",
@@ -90,7 +98,6 @@ public class ListEditActivity extends Activity {
         }
         @Override
         protected void onPostExecute(Boolean success){
-            Log.d(TAG, "INSIDE DeleteNoteTask onPostExecute success = " + success);
             if(!success){
                 Toast.makeText(ListEditActivity.this,
                         "Database unavailable, failed to delete note from table",
@@ -115,7 +122,6 @@ public class ListEditActivity extends Activity {
         }
         @Override
         protected void onPostExecute(Integer success){
-            Log.d(TAG, "INSIDE AddItemTask onPostExecute success = " + success);
             if(success > 0) {
                 item.setId(success);
             } else {
@@ -138,7 +144,6 @@ public class ListEditActivity extends Activity {
         }
         @Override
         protected void onPostExecute(Boolean success){
-            Log.d(TAG, "INSIDE UpdateItemTask onPostExecute success = " + success);
             if(!success){
                 Toast.makeText(ListEditActivity.this,
                         "Database unavailable, failed to update item in table",
@@ -158,7 +163,6 @@ public class ListEditActivity extends Activity {
         }
         @Override
         protected void onPostExecute(Boolean success){
-            Log.d(TAG, "INSIDE DeleteItemTask onPostExecute success = " + success);
             if(!success){
                 Toast.makeText(ListEditActivity.this,
                         "Database unavailable, failed to delete item from table",
@@ -178,7 +182,6 @@ public class ListEditActivity extends Activity {
         }
         @Override
         protected void onPostExecute(Boolean success){
-            Log.d(TAG, "INSIDE DeleteAllItemsTask onPostExecute success = " + success);
             if(!success){
                 Toast.makeText(ListEditActivity.this,
                         "Database unavailable, failed to delete all items from table",
@@ -305,38 +308,32 @@ public class ListEditActivity extends Activity {
     @Override
     protected void onStart(){
         super.onStart();
-        Log.d(TAG, "INSIDE: onStart");
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        Log.d(TAG, "INSIDE: onResume");
     }
 
     @Override
     protected void onPause(){
         super.onPause();
-        Log.d(TAG, "INSIDE: onPause");
     }
 
     @Override
     protected void onStop(){
         super.onStop();
-        Log.d(TAG, "INSIDE: onStop");
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
-        Log.d(TAG, "INSIDE: onDestroy");
         //Db close
         dao.close();
     }
 
     @Override
     public void onBackPressed(){
-        Log.d(TAG, "INSIDE: onBackPressed");
         Intent intent = new Intent();
         if(!savedCalled){ intent.putExtra("changes", updateDB()); }
         else { intent.putExtra("changes", savedCalled); }
@@ -348,9 +345,7 @@ public class ListEditActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "INSIDE: onActivityResult");
         if(requestCode == 2){
-            Log.d(TAG, "INSIDE: onActivityResult: Came from Settings");
             Bundle outState = toBundle();
             Intent intent = new Intent(this, ListEditActivity.class);
             intent.putExtras(outState);
@@ -371,7 +366,7 @@ public class ListEditActivity extends Activity {
         outState.putBoolean("changes", changes);
         outState.putBoolean("listNameChange", listNameChange);
         outState.putBoolean("savedCalled", savedCalled);
-        //super.onSaveInstanceState(outState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -561,11 +556,8 @@ public class ListEditActivity extends Activity {
     private void deleteListDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(ListEditActivity.this);
         builder.setTitle("Delete");
-        if(switchTheme){
-            builder.setIcon(R.drawable.ic_warning_black_18dp);
-        } else {
-            builder.setIcon(R.drawable.ic_warning_gold_18dp);
-        }
+        if(switchTheme){ builder.setIcon(R.drawable.ic_warning_black_18dp); }
+        else { builder.setIcon(R.drawable.ic_warning_gold_18dp); }
         builder.setMessage("Are you sure you want to delete this list?");
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
@@ -595,8 +587,7 @@ public class ListEditActivity extends Activity {
     //Utility that creates a string of the current date and time
     public String getDateTime(){
         SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss", Locale.getDefault()
-        );
+                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         Date date = new Date();
         return dateFormat.format(date);
     }
@@ -604,8 +595,7 @@ public class ListEditActivity extends Activity {
     //Utility that creates a string of the current date
     public String getDateString(){
         SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "MM-dd-yyyy", Locale.getDefault()
-        );
+                "MM-dd-yyyy", Locale.getDefault());
         Date date = new Date();
         return "(" + dateFormat.format(date) + ")";
     }
@@ -615,9 +605,7 @@ public class ListEditActivity extends Activity {
         String newListName = listNameField.getText().toString();
         listNameChange = !oldListName.equals(newListName);
         if((changes || listNameChange) && !deleteListAfterChanges){
-            if(newListName.equals("")){
-                newListName = getDateString();
-            }
+            if(newListName.equals("")){ newListName = getDateString(); }
             if(list.getId() > 0){
                 //update list in db
                 list.setLastModified(getDateTime());
@@ -680,7 +668,6 @@ public class ListEditActivity extends Activity {
             }
             Toast.makeText(getApplicationContext(), "Saved",
                     Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "INSIDE: updateDB database changes saved");
             return true;
         } else if(deleteListAfterChanges || deleteListCalled) {
             if(todoAdapter.getItemCount() > 2 || !deletedItems.isEmpty()){
@@ -691,7 +678,6 @@ public class ListEditActivity extends Activity {
             }
             Toast.makeText(getApplicationContext(), "Deleted",
                     Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "INSIDE: updateDB database changes saved");
             return true;
         } else {
             return false;

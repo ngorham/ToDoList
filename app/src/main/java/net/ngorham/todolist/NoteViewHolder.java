@@ -5,7 +5,12 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * Created by NBG on 3/16/2018.
+ * To Do List
+ * Note.java
+ * Purpose: Provides access to RecyclerView.ViewHolder for Note option
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/16/2018
  */
 
 public class NoteViewHolder extends RecyclerView.ViewHolder {

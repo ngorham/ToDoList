@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +12,12 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 /**
- * Created by NBG on 3/14/2018.
+ * To Do List
+ * ToDoListAdapter.java
+ * Purpose: Displays list of lists or list of items in a RecyclerView
  *
+ * @author Neil Gorham
+ * @version 1.0 03/14/2018
  */
 
 public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

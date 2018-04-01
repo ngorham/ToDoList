@@ -15,11 +15,19 @@ import android.view.View;
 
 import java.lang.reflect.Method;
 
+/**
+ * To Do List
+ * MainActivity.java
+ * Top-level
+ * Purpose: Displays the name of each list
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/08/2018
+ */
+
 public class MainActivity extends Activity {
     //Private variables
     private Boolean listChanges = false;
-    //Private constants
-    private final String TAG = "MainActivity"; //debug
     //Recycler View variables
     private RecyclerView todoRecycler;
     private ToDoListAdapter todoAdapter;
@@ -71,38 +79,32 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart(){
         super.onStart();
-        Log.d(TAG, "INSIDE: onStart");
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        Log.d(TAG, "INSIDE: onResume");
     }
 
     @Override
     protected void onPause(){
         super.onPause();
-        Log.d(TAG, "INSIDE: onPause");
     }
 
     @Override
     protected void onStop(){
         super.onStop();
-        Log.d(TAG, "INSIDE: onStop");
     }
 
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        Log.d(TAG, "INSIDE: onDestroy");
         dao.close();
     }
 
     @Override
     protected void onRestart(){
         super.onRestart();
-        Log.d(TAG, "INSIDE: onRestart");
         if(switchTheme != sharedPrefs.getBoolean("switch_theme", false)){
             finish();
             startActivity(getIntent());
@@ -117,15 +119,11 @@ public class MainActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "INSIDE: onActivityResult");
         if (requestCode == 1) {
-            Log.d(TAG, "INSIDE: onActivityResult: requestCode = 1");
             if(resultCode == RESULT_OK) {
                 listChanges = data.getExtras().getBoolean("changes");
             }
         } else if(requestCode == 2){
-            Log.d(TAG, "INSIDE: onActivityResult: requestCode = 2");
-            Log.d(TAG, "INSIDE: onActivityResult: Came from SettingsActivity");
             finish();
             startActivity(getIntent());
         }

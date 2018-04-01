@@ -1,8 +1,6 @@
 <resources>
-
     <!-- Base application theme. -->
     <style name="LightTheme" parent="android:Theme.Holo.Light">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimaryLight</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkLight</item>
         <item name="colorAccent">@color/colorAccentLight</item>
@@ -17,6 +15,4 @@
         <item name="android:windowBackground">@color/windowBackground</item>
         <item name="android:textColorSecondary">@color/textSecondaryDark</item>
     </style>
-
-
 </resources>

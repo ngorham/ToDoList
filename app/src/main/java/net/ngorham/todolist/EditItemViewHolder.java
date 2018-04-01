@@ -6,7 +6,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 /**
- * Created by NBG on 3/20/2018.
+ * To Do List
+ * EditItemViewHolder.java
+ * Purpose: Provides access to RecyclerView.ViewHolder for Edit Item option
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/20/2018
  */
 
 public class EditItemViewHolder extends RecyclerView.ViewHolder {

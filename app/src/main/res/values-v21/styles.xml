@@ -1,7 +1,6 @@
 <resources>
     <!-- Base application theme. -->
     <style name="LightTheme" parent="android:Theme.Material.Light">
-        <!-- Customize your theme here. -->
         <item name="android:colorPrimary">@color/colorPrimaryLight</item>
         <item name="android:colorPrimaryDark">@color/colorPrimaryDarkLight</item>
         <item name="android:colorAccent">@color/colorAccentLight</item>

@@ -1,7 +1,12 @@
 package net.ngorham.todolist;
 
 /**
- * Created by NBG on 3/14/2018.
+ * To Do List
+ * Note.java
+ * Purpose: Provides local storage and access of a Note (list)
+ *
+ * @author Neil Gorham
+ * @version 1.0 03/14/2018
  */
 
 public class Note {
