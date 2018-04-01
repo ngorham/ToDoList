@@ -242,7 +242,7 @@ public class ListEditActivity extends Activity {
             }
         }
         //Create Adapter
-        todoAdapter = new ToDoListAdapter(items, 1);
+        todoAdapter = new ToDoListAdapter(items, 1, this);
         //Set Adapter
         todoRecycler.setAdapter(todoAdapter);
         //Set up onClick listener

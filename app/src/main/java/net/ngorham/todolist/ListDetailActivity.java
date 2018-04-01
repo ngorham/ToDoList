@@ -124,7 +124,7 @@ public class ListDetailActivity extends Activity {
         //Set ActionBar title
         getActionBar().setTitle(list.getName());
         //Set up Adapter
-        todoAdapter = new ToDoListAdapter(dao.fetchAllItems(list.getId()), 0);
+        todoAdapter = new ToDoListAdapter(dao.fetchAllItems(list.getId()), 0, this);
         todoRecycler.setAdapter(todoAdapter);
         //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){

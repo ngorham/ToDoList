@@ -1,6 +1,9 @@
 package net.ngorham.todolist;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Paint;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,10 +19,14 @@ import java.util.ArrayList;
 
 public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     //Private variables
+    private Context context;
     private Listener listener;
     private ArrayList<Item> items;
     private ArrayList<Note> notes;
     private int editType = 0;
+    //SharedPreferences variables
+    private SharedPreferences sharedPrefs;
+    private boolean switchTheme;
     //Private constants
     private final int NOTE_TYPE = 0;
     private final int ITEM_TYPE = 1;
@@ -32,13 +39,15 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     //Constructor with List<Item>
-    public ToDoListAdapter(ArrayList<Item> items, int editType){
+    public ToDoListAdapter(ArrayList<Item> items, int editType, Context context){
+        this.context = context;
         this.items = items;
         this.editType = editType;
     }
 
     //Constructor with List<Note>
-    public ToDoListAdapter(int editType, ArrayList<Note> notes){
+    public ToDoListAdapter(int editType, ArrayList<Note> notes, Context context){
+        this.context = context;
         this.notes = notes;
         this.editType = editType;
     }
@@ -68,6 +77,8 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     //Configure Item type item
     private void configureItem(ItemViewHolder holder, final int position){
         Item item = items.get(position);
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        switchTheme = sharedPrefs.getBoolean("switch_theme", false);
         if(item != null){
             holder.getNameLabel().setText(item.getName());
             if(item.getStrike() == 1){
@@ -82,6 +93,13 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             //Date date = new Date(
             String lastModifiedDate = getMonthDay(item.getLastModified());
             holder.getLastModifiedLabel().setText(lastModifiedDate);
+            if(switchTheme){
+                holder.getNameLabel().setTextColor(context.getResources().getColor(R.color.textSecondaryLight));
+                holder.getLastModifiedLabel().setTextColor(context.getResources().getColor(R.color.colorAccentLight));
+            } else {
+                holder.getNameLabel().setTextColor(context.getResources().getColor(R.color.textSecondaryDark));
+                holder.getLastModifiedLabel().setTextColor(context.getResources().getColor(R.color.colorAccentDark));
+            }
         }
         holder.getNameLabel().setOnClickListener(new View.OnClickListener(){
             @Override
@@ -97,8 +115,15 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     //Configure AddItem type item
     private void configureAddItem(AddItemViewHolder holder, final int position){
         Item item = items.get(position);
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        switchTheme = sharedPrefs.getBoolean("switch_theme", false);
         if(item != null){
             holder.getTextLabel().setText(item.getName());
+            if(switchTheme){
+                holder.getTextLabel().setTextColor(context.getResources().getColor(R.color.textSecondaryLight));
+            } else {
+                holder.getTextLabel().setTextColor(context.getResources().getColor(R.color.textSecondaryDark));
+            }
         }
         holder.getParent().setOnClickListener(new View.OnClickListener(){
             @Override
@@ -113,8 +138,15 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     //Configure EditItem type item
     private void configureEditItem(EditItemViewHolder holder, final int position){
         Item item = items.get(position);
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        switchTheme = sharedPrefs.getBoolean("switch_theme", false);
         if(item != null){
             holder.getNameLabel().setText(item.getName());
+            if(switchTheme){
+                holder.getNameLabel().setTextColor(context.getResources().getColor(R.color.textSecondaryLight));
+            } else {
+                holder.getNameLabel().setTextColor(context.getResources().getColor(R.color.textSecondaryDark));
+            }
             if(item.getStrike() == 1){
                 holder.getNameLabel().setPaintFlags(
                         holder.getNameLabel().getPaintFlags()

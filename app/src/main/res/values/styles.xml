@@ -6,6 +6,8 @@
         <item name="colorPrimary">@color/colorPrimaryLight</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkLight</item>
         <item name="colorAccent">@color/colorAccentLight</item>
+        <item name="android:textColorPrimary">@color/textPrimaryLight</item>
+        <item name="android:textColorSecondary">@color/textSecondaryLight</item>
     </style>
     <style name="DarkTheme" parent="android:Theme.Holo">
         <item name="colorPrimary">@color/colorPrimaryDark</item>
@@ -13,6 +15,7 @@
         <item name="colorAccent">@color/colorAccentDark</item>
         <item name="android:textColorPrimary">@color/textPrimaryDark</item>
         <item name="android:windowBackground">@color/windowBackground</item>
+        <item name="android:textColorSecondary">@color/textSecondaryDark</item>
     </style>
 
 

@@ -6,12 +6,15 @@
         <item name="android:colorPrimaryDark">@color/colorPrimaryDarkLight</item>
         <item name="android:colorAccent">@color/colorAccentLight</item>
         <item name="android:textColorPrimary">@color/textPrimaryLight</item>
-        <item name="android:textColorSecondary">@color/textSecondary</item>
+        <item name="android:textColorSecondary">@color/textSecondaryLight</item>
+        <item name="android:textColorTertiary">@color/textTertiaryLight</item>
     </style>
     <style name="DarkTheme" parent="android:Theme.Material">
         <item name="android:colorPrimary">@color/colorPrimaryDark</item>
         <item name="android:colorAccent">@color/colorAccentDark</item>
         <item name="android:textColorPrimary">@color/textPrimaryDark</item>
         <item name="android:windowBackground">@color/windowBackground</item>
+        <item name="android:textColorSecondary">@color/textSecondaryDark</item>
+        <item name="android:textColorTertiary">@color/textTertiaryDark</item>
     </style>
 </resources>

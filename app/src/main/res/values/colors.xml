@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimaryDark">#424242</color>
+    <!-- Dark Theme -->
+    <color name="colorPrimaryDark">#212121</color>
     <color name="colorPrimaryDarkDark">#000</color>
-    <color name="colorAccentDark">#ffb74d</color>
-    <color name="windowBackground">#6d6d6d</color>
-    <color name="textPrimaryDark">#ffb74d</color>
-    <color name="textSecondary">#5e35b1</color>
+    <color name="colorAccentDark">#FF8F00</color>
+    <color name="windowBackground">#6D6D6D</color>
+    <color name="textPrimaryDark">#FFB74D</color>
+    <color name="textSecondaryDark">#FFF</color>
+    <color name="textTertiaryDark">#5E35B1</color>
+
     <color name="colorDivider">#424242</color>
-    <color name="colorPrimaryLight">#FFF</color>
+
+    <!-- Light Theme -->
+    <color name="colorPrimaryLight">#efefef</color>
     <color name="colorPrimaryDarkLight">#000</color>
-    <color name="colorAccentLight">#F0F</color>
+    <color name="colorAccentLight">#00ACC1</color>
     <color name="textPrimaryLight">#000</color>
+    <color name="textSecondaryLight">#222</color>
+    <color name="textTertiaryLight">#5E35B1</color>
 </resources>

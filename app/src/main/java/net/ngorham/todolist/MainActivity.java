@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         //Set up DAO
         dao = new ToDoListDAO(this);
         //Set up Adapter
-        todoAdapter = new ToDoListAdapter(0, dao.fetchAllNotes());
+        todoAdapter = new ToDoListAdapter(0, dao.fetchAllNotes(), this);
         todoRecycler.setAdapter(todoAdapter);
         //Set up onClick listener
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
