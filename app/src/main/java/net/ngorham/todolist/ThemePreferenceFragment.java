@@ -13,13 +13,9 @@ import android.widget.TextView;
  * A simple {@link Fragment} subclass.
  */
 public class ThemePreferenceFragment extends PreferenceFragment {
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        TextView textView = new TextView(getActivity());
-        textView.setText(R.string.hello_blank_fragment);
-        return textView;
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.xml.preferences);
     }
-
 }
