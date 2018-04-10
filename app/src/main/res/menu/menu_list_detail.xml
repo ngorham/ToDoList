@@ -15,6 +15,16 @@
         android:orderInCategory="2"
         android:showAsAction="never|withText" />
     <item
+        android:id="@+id/check_list"
+        android:title="@string/check_list"
+        android:orderInCategory="3"
+        android:showAsAction="never|withText" />
+    <item
+        android:id="@+id/uncheck_list"
+        android:title="@string/uncheck_list"
+        android:orderInCategory="4"
+        android:showAsAction="never|withText" />
+    <item
         android:id="@+id/app_settings"
         android:title="@string/app_settings"
         android:icon="@drawable/ic_settings_gold_18dp"

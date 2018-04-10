@@ -276,6 +276,12 @@ public class ListDetailActivity extends Activity {
             case R.id.delete_list: //Delete list action
                 deleteListDialog();
                 return true;
+            case R.id.check_list: //Check all items action
+                strikeAllItems();
+                return true;
+            case R.id.uncheck_list: //Uncheck all items action
+                unstrikeAllItems();
+                return true;
             case R.id.app_settings: //Settings action
                 intent = new Intent(this, SettingsActivity.class);
                 startActivityForResult(intent, 2);
@@ -349,5 +355,15 @@ public class ListDetailActivity extends Activity {
         builder.setCancelable(true);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    //Strike all list items
+    private void strikeAllItems(){
+
+    }
+
+    //Unstrike all list items
+    private void unstrikeAllItems(){
+
     }
 }

@@ -5,6 +5,8 @@
     <string name="edit_list">Edit</string>
     <string name="delete_list">Delete</string>
     <string name="save_list">Save</string>
+    <string name="check_list">Check all items</string>
+    <string name="uncheck_list">Uncheck all items</string>
     <string name="text_field">Editable Text</string>
     <string name="add_item">Add Item</string>
     <string name="edit_item">Edit Item</string>
