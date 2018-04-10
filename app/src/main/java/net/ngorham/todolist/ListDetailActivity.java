@@ -30,7 +30,9 @@ import java.lang.reflect.Method;
  * Purpose: Displays the name of the selected list and item contents
  *
  * @author Neil Gorham
- * @version 1.0 03/10/2018
+ * @version 1.1 04/09/2018
+ *
+ * 1.1: Added strikeAllItems method
  */
 
 public class ListDetailActivity extends Activity {
@@ -276,11 +278,11 @@ public class ListDetailActivity extends Activity {
             case R.id.delete_list: //Delete list action
                 deleteListDialog();
                 return true;
-            case R.id.check_list: //Check all items action
-                strikeAllItems();
+            case R.id.check_list: //Strike all items action
+                strikeAllItems(0, 1);
                 return true;
-            case R.id.uncheck_list: //Uncheck all items action
-                unstrikeAllItems();
+            case R.id.uncheck_list: //Unstrike all items action
+                strikeAllItems(1, 0);
                 return true;
             case R.id.app_settings: //Settings action
                 intent = new Intent(this, SettingsActivity.class);
@@ -357,13 +359,17 @@ public class ListDetailActivity extends Activity {
         alertDialog.show();
     }
 
-    //Strike all list items
-    private void strikeAllItems(){
-
-    }
-
-    //Unstrike all list items
-    private void unstrikeAllItems(){
-
+    //Strike or unstrike all list items
+    private void strikeAllItems(int check, int value){
+        for(int i = 0; i < todoAdapter.getItemCount(); i++){
+            Item item = todoAdapter.getItemList().get(i);
+            if(item != null){
+                if(item.getStrike() == check){
+                    item.setStrike(value);
+                    new UpdateItemStrikeTask().execute(item);
+                }
+            }
+        }
+        todoAdapter.notifyItemRangeChanged(0, todoAdapter.getItemCount());
     }
 }
