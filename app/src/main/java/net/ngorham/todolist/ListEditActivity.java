@@ -37,7 +37,9 @@ import java.util.Locale;
  * and provides list manipulation options
  *
  * @author Neil Gorham
- * @version 1.0 03/19/2018
+ * @version 1.1 04/11/2018
+ *
+ * 1.1: Replaced dialog strings with strings in strings.xml
  */
 
 public class ListEditActivity extends Activity {
@@ -460,7 +462,7 @@ public class ListEditActivity extends Activity {
         View addItemView = getLayoutInflater().inflate(R.layout.add_item_dialog, null);
         builder.setView(addItemView);
         final EditText addItemField = addItemView.findViewById(R.id.add_item_field);
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 int newPos;
@@ -489,7 +491,7 @@ public class ListEditActivity extends Activity {
                 savedCalled = false;
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //cancel, return to activity
@@ -511,7 +513,7 @@ public class ListEditActivity extends Activity {
         builder.setView(editItemView);
         final EditText editItemField = editItemView.findViewById(R.id.edit_item_field);
         editItemField.setText(itemName, TextView.BufferType.EDITABLE);
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //update item.name in db
@@ -541,7 +543,7 @@ public class ListEditActivity extends Activity {
                 }
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //cancel, return to activity
@@ -558,8 +560,8 @@ public class ListEditActivity extends Activity {
         builder.setTitle(R.string.delete_list);
         if(switchTheme){ builder.setIcon(R.drawable.ic_warning_black_18dp); }
         else { builder.setIcon(R.drawable.ic_warning_gold_18dp); }
-        builder.setMessage("Are you sure you want to delete this list?");
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setMessage(R.string.dialog_delete_list_message);
+        builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 deleteListCalled = true;
@@ -571,7 +573,7 @@ public class ListEditActivity extends Activity {
                 finish();
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //cancel, return to activity

@@ -32,7 +32,9 @@ import java.lang.reflect.Method;
  * @author Neil Gorham
  * @version 1.1 04/09/2018
  *
- * 1.1: Added strikeAllItems method
+ * 1.1: Added checkAllItemsDialog method, removeCheckedDialog method,
+ * DeleteItemTask class
+ * Replaced dialog strings with strings in strings.xml
  */
 
 public class ListDetailActivity extends Activity {
@@ -351,8 +353,8 @@ public class ListDetailActivity extends Activity {
         builder.setTitle(R.string.delete_list);
         if(switchTheme){ builder.setIcon(R.drawable.ic_warning_black_18dp); }
         else { builder.setIcon(R.drawable.ic_warning_gold_18dp); }
-        builder.setMessage("Are you sure you want to delete this list?");
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setMessage(R.string.dialog_delete_list_message);
+        builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 listChanges = true;
@@ -369,7 +371,7 @@ public class ListDetailActivity extends Activity {
                 finish();
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //cancel, return to activity
@@ -384,21 +386,20 @@ public class ListDetailActivity extends Activity {
     //Display Strike or unstrike all list items AlertDialog
     private void checkAllItemsDialog(final int check, final int value){
         AlertDialog.Builder builder = new AlertDialog.Builder(ListDetailActivity.this);
-        int title, icon;
-        String msg = "";
+        int title, icon, msg;
         if(check == 0){ //strike all list items
             title = R.string.check_list;
             icon = R.drawable.ic_checkbox_marked_outline_black_18dp;
-            msg = "Are you sure you want to check all items?";
+            msg = R.string.dialog_check_list_message;
         } else { //unstrike all list items
             title = R.string.uncheck_list;
             icon = R.drawable.ic_checkbox_blank_outline_black_18dp;
-            msg = "Are you sure you want to uncheck all items?";
+            msg = R.string.dialog_uncheck_list_message;
         }
         builder.setTitle(title);
         builder.setIcon(icon);
         builder.setMessage(msg);
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if(!todoAdapter.getItemList().isEmpty()){
@@ -415,7 +416,7 @@ public class ListDetailActivity extends Activity {
                 }
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //cancel
@@ -431,8 +432,8 @@ public class ListDetailActivity extends Activity {
         AlertDialog.Builder builder = new AlertDialog.Builder(ListDetailActivity.this);
         builder.setTitle(R.string.remove_checked);
         builder.setIcon(R.drawable.ic_close_black_18dp);
-        builder.setMessage("Are you sure you to remove checked items?");
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setMessage(R.string.dialog_remove_checked_message);
+        builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Remove checked items
@@ -450,7 +451,7 @@ public class ListDetailActivity extends Activity {
                 }
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //cancel

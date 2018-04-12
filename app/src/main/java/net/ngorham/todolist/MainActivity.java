@@ -1,6 +1,8 @@
 package net.ngorham.todolist;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -175,6 +177,9 @@ public class MainActivity extends Activity {
                 intent.putExtra("NAME", "");
                 startActivityForResult(intent, 1);
                 return true;
+            case R.id.view_select: //View select action
+                viewSelectDialog();
+                return true;
             case R.id.app_settings: //Settings action
                 intent = new Intent(this, SettingsActivity.class);
                 startActivityForResult(intent, 2);
@@ -205,5 +210,26 @@ public class MainActivity extends Activity {
             }
         }
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    //Display View select AlertDialog
+    private void viewSelectDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(R.string.view_select);
+        builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.setCancelable(true);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }
