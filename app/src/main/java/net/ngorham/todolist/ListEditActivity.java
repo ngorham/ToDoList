@@ -555,7 +555,7 @@ public class ListEditActivity extends Activity {
     //Display Delete List AlertDialog
     private void deleteListDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(ListEditActivity.this);
-        builder.setTitle("Delete");
+        builder.setTitle(R.string.delete_list);
         if(switchTheme){ builder.setIcon(R.drawable.ic_warning_black_18dp); }
         else { builder.setIcon(R.drawable.ic_warning_gold_18dp); }
         builder.setMessage("Are you sure you want to delete this list?");

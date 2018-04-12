@@ -27,6 +27,12 @@
         android:orderInCategory="4"
         android:showAsAction="never|withText" />
     <item
+        android:id="@+id/remove_checked"
+        android:title="@string/remove_checked"
+        android:icon="@drawable/ic_close_black_18dp"
+        android:orderInCategory="5"
+        android:showAsAction="never|withText"/>
+    <item
         android:id="@+id/app_settings"
         android:title="@string/app_settings"
         android:icon="@drawable/ic_settings_gold_18dp"

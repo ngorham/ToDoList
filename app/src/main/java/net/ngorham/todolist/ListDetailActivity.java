@@ -88,6 +88,25 @@ public class ListDetailActivity extends Activity {
         }
     }
 
+    //Delete Item from db
+    private class DeleteItemTask extends AsyncTask<Integer, Void, Boolean> {
+        @Override
+        protected void onPreExecute(){}
+        @Override
+        protected Boolean doInBackground(Integer... itemIds){
+            int itemId = itemIds[0];
+            return dao.deleteItem(itemId);
+        }
+        @Override
+        protected void onPostExecute(Boolean success){
+            if(!success){
+                Toast.makeText(ListDetailActivity.this,
+                        "Database unavailable, failed to delete item from table",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     //Delete all Items from db
     private class DeleteAllItemsTask extends AsyncTask<Integer, Void, Boolean> {
         @Override
@@ -279,10 +298,13 @@ public class ListDetailActivity extends Activity {
                 deleteListDialog();
                 return true;
             case R.id.check_list: //Strike all items action
-                strikeAllItems(0, 1);
+                checkAllItemsDialog(0, 1);
                 return true;
             case R.id.uncheck_list: //Unstrike all items action
-                strikeAllItems(1, 0);
+                checkAllItemsDialog(1, 0);
+                return true;
+            case R.id.remove_checked: //Remove striked items action
+                removeCheckedDialog();
                 return true;
             case R.id.app_settings: //Settings action
                 intent = new Intent(this, SettingsActivity.class);
@@ -326,7 +348,7 @@ public class ListDetailActivity extends Activity {
     //Display Delete List AlertDialog
     private void deleteListDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(ListDetailActivity.this);
-        builder.setTitle("Delete");
+        builder.setTitle(R.string.delete_list);
         if(switchTheme){ builder.setIcon(R.drawable.ic_warning_black_18dp); }
         else { builder.setIcon(R.drawable.ic_warning_gold_18dp); }
         builder.setMessage("Are you sure you want to delete this list?");
@@ -359,17 +381,83 @@ public class ListDetailActivity extends Activity {
         alertDialog.show();
     }
 
-    //Strike or unstrike all list items
-    private void strikeAllItems(int check, int value){
-        for(int i = 0; i < todoAdapter.getItemCount(); i++){
-            Item item = todoAdapter.getItemList().get(i);
-            if(item != null){
-                if(item.getStrike() == check){
-                    item.setStrike(value);
-                    new UpdateItemStrikeTask().execute(item);
+    //Display Strike or unstrike all list items AlertDialog
+    private void checkAllItemsDialog(final int check, final int value){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListDetailActivity.this);
+        int title, icon;
+        String msg = "";
+        if(check == 0){ //strike all list items
+            title = R.string.check_list;
+            icon = R.drawable.ic_checkbox_marked_outline_black_18dp;
+            msg = "Are you sure you want to check all items?";
+        } else { //unstrike all list items
+            title = R.string.uncheck_list;
+            icon = R.drawable.ic_checkbox_blank_outline_black_18dp;
+            msg = "Are you sure you want to uncheck all items?";
+        }
+        builder.setTitle(title);
+        builder.setIcon(icon);
+        builder.setMessage(msg);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(!todoAdapter.getItemList().isEmpty()){
+                    for(int c = 0; c < todoAdapter.getItemCount(); c++){
+                        Item item = todoAdapter.getItemList().get(c);
+                        if(item != null){
+                            if(item.getStrike() == check){
+                                item.setStrike(value);
+                                new UpdateItemStrikeTask().execute(item);
+                            }
+                        }
+                    }
+                    todoAdapter.notifyItemRangeChanged(0, todoAdapter.getItemCount());
                 }
             }
-        }
-        todoAdapter.notifyItemRangeChanged(0, todoAdapter.getItemCount());
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //cancel
+            }
+        });
+        builder.setCancelable(true);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    //Display Remove checked items AlertDialog
+    private void removeCheckedDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListDetailActivity.this);
+        builder.setTitle(R.string.remove_checked);
+        builder.setIcon(R.drawable.ic_close_black_18dp);
+        builder.setMessage("Are you sure you to remove checked items?");
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Remove checked items
+                if (!todoAdapter.getItemList().isEmpty()) {
+                    for (int c = 0; c < todoAdapter.getItemCount(); c++) {
+                        Item item = todoAdapter.getItemList().get(c);
+                        if (item != null) {
+                            if (item.getStrike() == 1) {
+                                new DeleteItemTask().execute(item.getId());
+                                todoAdapter.getItemList().remove(item);
+                            }
+                        }
+                    }
+                    todoAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //cancel
+            }
+        });
+        builder.setCancelable(true);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }
