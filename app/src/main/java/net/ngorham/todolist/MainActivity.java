@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import java.lang.reflect.Method;
 
@@ -214,17 +216,32 @@ public class MainActivity extends Activity {
 
     //Display View select AlertDialog
     private void viewSelectDialog(){
+        String[] viewSelectItems = {
+          "List",
+          "Detail",
+          "Grid",
+          "Large grid"
+        };
+        Integer[] viewSelectIcons = {
+                R.drawable.ic_view_sequential_black_18dp,
+                R.drawable.ic_view_agenda_black_18dp,
+                R.drawable.ic_view_grid_black_18dp,
+                R.drawable.ic_view_large_grid_black_18dp
+        };
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle(R.string.view_select);
-        builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+        View viewSelectOptions = getLayoutInflater().inflate(R.layout.view_select_options, null);
+        builder.setView(viewSelectOptions);
+        ListView lv = viewSelectOptions.findViewById(R.id.view_options);
+        ViewSelectAdapter adapter = new ViewSelectAdapter(
+                MainActivity.this,
+                viewSelectItems,
+                viewSelectIcons
+        );
+        lv.setAdapter(adapter);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
             }
         });
