@@ -16,8 +16,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 /**
  * To Do List
@@ -216,37 +218,37 @@ public class MainActivity extends Activity {
 
     //Display View select AlertDialog
     private void viewSelectDialog(){
-        String[] viewSelectItems = {
-          "List",
-          "Detail",
-          "Grid",
-          "Large grid"
-        };
-        Integer[] viewSelectIcons = {
-                R.drawable.ic_view_sequential_black_18dp,
-                R.drawable.ic_view_agenda_black_18dp,
-                R.drawable.ic_view_grid_black_18dp,
-                R.drawable.ic_view_large_grid_black_18dp
-        };
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle(R.string.view_select);
+        final ArrayList<ViewSelectOption> options = new ArrayList<>();
+        options.add(new ViewSelectOption("List", R.drawable.ic_view_sequential_black_18dp));
+        options.add(new ViewSelectOption("Detail", R.drawable.ic_view_agenda_black_18dp));
+        options.add(new ViewSelectOption("Grid", R.drawable.ic_view_grid_black_18dp));
+        options.add(new ViewSelectOption("Large grid", R.drawable.ic_view_large_grid_black_18dp));
+
         View viewSelectOptions = getLayoutInflater().inflate(R.layout.view_select_options, null);
-        builder.setView(viewSelectOptions);
         ListView lv = viewSelectOptions.findViewById(R.id.view_options);
         ViewSelectAdapter adapter = new ViewSelectAdapter(
                 MainActivity.this,
-                viewSelectItems,
-                viewSelectIcons
+                options
         );
         lv.setAdapter(adapter);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(R.string.view_select);
+        builder.setView(viewSelectOptions);
+        /*builder.setAdapter(adapter, new DialogInterface.OnClickListener(){
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+            public void onClick(DialogInterface dialogInterface, int position){
 
             }
-        });
+        });*/
         builder.setCancelable(true);
         AlertDialog alertDialog = builder.create();
+        /*lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, "Option selected: " + options.get(position).getOption(),Toast.LENGTH_SHORT).show();
+            }
+        });*/
         alertDialog.show();
     }
 }
