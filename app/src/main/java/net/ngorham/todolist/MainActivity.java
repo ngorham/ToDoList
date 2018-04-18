@@ -219,10 +219,10 @@ public class MainActivity extends Activity {
     //Display View select AlertDialog
     private void viewSelectDialog(){
         final ArrayList<ViewSelectOption> options = new ArrayList<>();
-        options.add(new ViewSelectOption("List", R.drawable.ic_view_sequential_black_18dp));
-        options.add(new ViewSelectOption("Detail", R.drawable.ic_view_agenda_black_18dp));
-        options.add(new ViewSelectOption("Grid", R.drawable.ic_view_grid_black_18dp));
-        options.add(new ViewSelectOption("Large grid", R.drawable.ic_view_large_grid_black_18dp));
+        options.add(new ViewSelectOption("List", R.drawable.ic_view_sequential_black_24dp));
+        options.add(new ViewSelectOption("Details", R.drawable.ic_view_agenda_black_24dp));
+        options.add(new ViewSelectOption("Grid", R.drawable.ic_view_grid_black_24dp));
+        options.add(new ViewSelectOption("Large grid", R.drawable.ic_view_large_grid_black_24dp));
 
         View viewSelectOptions = getLayoutInflater().inflate(R.layout.view_select_options, null);
         ListView lv = viewSelectOptions.findViewById(R.id.view_options);
@@ -234,21 +234,14 @@ public class MainActivity extends Activity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle(R.string.view_select);
-        builder.setView(viewSelectOptions);
-        /*builder.setAdapter(adapter, new DialogInterface.OnClickListener(){
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener(){
             @Override
             public void onClick(DialogInterface dialogInterface, int position){
-
+                Toast.makeText(MainActivity.this, "Option selected: " + options.get(position).getOption(), Toast.LENGTH_SHORT).show();
             }
-        });*/
+        });
         builder.setCancelable(true);
         AlertDialog alertDialog = builder.create();
-        /*lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, "Option selected: " + options.get(position).getOption(),Toast.LENGTH_SHORT).show();
-            }
-        });*/
         alertDialog.show();
     }
 }
