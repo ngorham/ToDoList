@@ -27,7 +27,7 @@
     <string name="switch_theme_summary_off">Dark Theme</string>
     <string name="switch_theme_summary_on">Light Theme</string>
     <string name="app_version_title">App Version</string>
-    <string name="app_version_summary">1.0 04/2018</string>
+    <string name="app_version_summary">1.1 04/2018</string>
     <string name="author_title">Author</string>
     <string name="author_summary">Neil Gorham</string>
     <string name="website">http://www.ngorham.net</string>
