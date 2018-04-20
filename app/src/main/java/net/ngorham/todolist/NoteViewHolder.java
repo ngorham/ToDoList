@@ -13,6 +13,7 @@ import android.widget.TextView;
  * @author Neil Gorham
  * @version 1.1 04/19/2018
  *
+ * 1.1:Added lastModifiedLabel, parent variables
  */
 
 public class NoteViewHolder extends RecyclerView.ViewHolder {
