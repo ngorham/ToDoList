@@ -18,10 +18,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 /**
  * To Do List
@@ -33,9 +36,11 @@ import java.lang.reflect.Method;
  * @version 1.1 04/09/2018
  *
  * 1.1: Added checkAllItemsDialog method, removeCheckedDialog method,
- * DeleteItemTask class
  * Replaced dialog strings with strings in strings.xml
- * Strike through on click sets listChanges to true and displays 'Saved' Toast
+ * Strike through on click sets listChanges to true, displays 'Saved' Toast
+ * and displays check mark icon image
+ * Check/Uncheck all items sets listChanges to true
+ * Remove all checked items sets listChanges to true
  */
 
 public class ListDetailActivity extends Activity {
@@ -91,25 +96,6 @@ public class ListDetailActivity extends Activity {
         }
     }
 
-    //Delete Item from db
-    private class DeleteItemTask extends AsyncTask<Integer, Void, Boolean> {
-        @Override
-        protected void onPreExecute(){}
-        @Override
-        protected Boolean doInBackground(Integer... itemIds){
-            int itemId = itemIds[0];
-            return dao.deleteItem(itemId);
-        }
-        @Override
-        protected void onPostExecute(Boolean success){
-            if(!success){
-                Toast.makeText(ListDetailActivity.this,
-                        "Database unavailable, failed to delete item from table",
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
     //Delete all Items from db
     private class DeleteAllItemsTask extends AsyncTask<Integer, Void, Boolean> {
         @Override
@@ -160,21 +146,31 @@ public class ListDetailActivity extends Activity {
         todoAdapter.setListener(new ToDoListAdapter.Listener(){
             @Override
             public void onClick(View view, int position){
-                TextView textView = (TextView)view;
+                TextView nameText = view.findViewById(R.id.name_text);
+                ImageButton optionsButton = view.findViewById(R.id.more_vert);
+                ImageView checkImage = view.findViewById(R.id.check_mark);
                 Item item = todoAdapter.getItemList().get(position);
                 if(item.getStrike() == 0){
-                    textView.setPaintFlags(textView.getPaintFlags()
+                    nameText.setPaintFlags(nameText.getPaintFlags()
                             | Paint.STRIKE_THRU_TEXT_FLAG);
                     item.setStrike(1);
+                    checkImage.setVisibility(View.VISIBLE);
+                    optionsButton.setVisibility(View.GONE);
                 } else { //Remove strike through
-                    textView.setPaintFlags(0);
+                    nameText.setPaintFlags(0);
                     item.setStrike(0);
+                    checkImage.setVisibility(View.GONE);
+                    optionsButton.setVisibility(View.VISIBLE);
                 }
                 new UpdateItemStrikeTask().execute(item);
                 listChanges = true;
             }
             @Override
             public void deleteItem(View v, int position){}
+            @Override
+            public void itemOptions(View v, int position){
+                Toast.makeText(ListDetailActivity.this, "Item Options selected, position = " + position, Toast.LENGTH_SHORT).show();
+            }
         });
         //Add divider item decoration
         Drawable divider = ContextCompat.getDrawable(this, R.drawable.divider);
@@ -418,6 +414,7 @@ public class ListDetailActivity extends Activity {
                         }
                     }
                     todoAdapter.notifyItemRangeChanged(0, todoAdapter.getItemCount());
+                    listChanges = true;
                 }
             }
         });
@@ -443,16 +440,18 @@ public class ListDetailActivity extends Activity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Remove checked items
                 if (!todoAdapter.getItemList().isEmpty()) {
-                    for (int c = 0; c < todoAdapter.getItemCount(); c++) {
+                    int count = todoAdapter.getItemCount();
+                    for (int c = 0; c < count; c++) {
                         Item item = todoAdapter.getItemList().get(c);
                         if (item != null) {
                             if (item.getStrike() == 1) {
-                                new DeleteItemTask().execute(item.getId());
-                                todoAdapter.getItemList().remove(item);
+                                dao.deleteItem(item.getId());
                             }
                         }
                     }
+                    todoAdapter.setItemList(dao.fetchAllItems(list.getId()));
                     todoAdapter.notifyDataSetChanged();
+                    listChanges = true;
                 }
             }
         });

@@ -273,6 +273,8 @@ public class ListEditActivity extends Activity {
                 todoAdapter.getItemList().remove(position);
                 todoAdapter.notifyDataSetChanged();
             }
+            @Override
+            public void itemOptions(View v, int position){}
         });
         //Add divider item decoration
         Drawable divider = ContextCompat.getDrawable(this, R.drawable.divider);

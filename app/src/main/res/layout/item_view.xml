@@ -14,15 +14,30 @@
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Title"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/last_modified_text"
+        app:layout_constraintEnd_toStartOf="@id/more_vert"
         app:layout_constraintTop_toTopOf="parent" />
-    <TextView
-        android:id="@+id/last_modified_text"
+    <ImageButton
+        android:id="@+id/more_vert"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textAlignment="textEnd"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Title"
+        android:background="@null"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="@string/more_vert"
+        android:src="@drawable/ic_more_vert_black_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:id="@+id/check_mark"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@null"
+        android:contentDescription="@string/check"
+        android:src="@drawable/ic_check_black_24dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

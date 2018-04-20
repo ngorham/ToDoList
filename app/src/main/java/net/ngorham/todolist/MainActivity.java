@@ -270,6 +270,8 @@ public class MainActivity extends Activity {
             }
             @Override
             public void deleteItem(View v, int position){}
+            @Override
+            public void itemOptions(View v, int position){}
         });
     }
 }

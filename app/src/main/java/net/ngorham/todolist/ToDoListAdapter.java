@@ -23,7 +23,8 @@ import java.util.ArrayList;
  *
  * 1.1: Added Note view constants for setting up NoteViewHolder instances,
  * Note view logic that determines which child views to display,
- * listItems container for list items
+ * listItems container for list items,
+ * itemOptions listener method for future dialog options
  */
 
 public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -51,6 +52,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public interface Listener {
         void onClick(View view, int position);
         void deleteItem(View view, int position);
+        void itemOptions(View view, int position);
     }
 
     //Constructor with List<Item>
@@ -134,28 +136,40 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 holder.getNameLabel().setPaintFlags(
                         holder.getNameLabel().getPaintFlags()
                                 | Paint.STRIKE_THRU_TEXT_FLAG);
+                holder.getCheckImage().setVisibility(View.VISIBLE);
+                holder.getOptionsButton().setVisibility(View.GONE);
             } else {
                 holder.getNameLabel().setPaintFlags(0);
+                holder.getCheckImage().setVisibility(View.GONE);
+                holder.getOptionsButton().setVisibility(View.VISIBLE);
             }
             //SimpleDateFormat dateFormat =
             //        new SimpleDateFormat("MMM dd", Locale.getDefault());
             //Date date = new Date(
-            String lastModifiedDate = getMonthDay(item.getLastModified());
-            holder.getLastModifiedLabel().setText(lastModifiedDate);
+            //String lastModifiedDate = getMonthDay(item.getLastModified());
+            //holder.getLastModifiedLabel().setText(lastModifiedDate);
             if(switchTheme){
                 holder.getNameLabel().setTextColor(context.getResources().getColor(R.color.textSecondaryLight));
-                holder.getLastModifiedLabel().setTextColor(context.getResources().getColor(R.color.colorAccentLight));
+                //holder.getLastModifiedLabel().setTextColor(context.getResources().getColor(R.color.colorAccentLight));
             } else {
                 holder.getNameLabel().setTextColor(context.getResources().getColor(R.color.textSecondaryDark));
-                holder.getLastModifiedLabel().setTextColor(context.getResources().getColor(R.color.colorAccentDark));
+                //holder.getLastModifiedLabel().setTextColor(context.getResources().getColor(R.color.colorAccentDark));
             }
         }
-        holder.getNameLabel().setOnClickListener(new View.OnClickListener(){
+        holder.getParent().setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 //If view is clicked, call onClick
                 if(listener != null){
                     listener.onClick(v, position);
+                }
+            }
+        });
+        holder.getOptionsButton().setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if(listener != null){
+                    listener.itemOptions(v, position);
                 }
             }
         });
