@@ -2,21 +2,20 @@ package net.ngorham.todolist;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,53 +27,52 @@ import java.util.ArrayList;
  * Purpose: Displays the name of each list
  *
  * @author Neil Gorham
- * @version 1.0 03/08/2018
+ * @version 1.1 04/12/2018
+ *
+ * 1.1: Added viewSelectDialog for selecting view layout preference,
+ * todoLayoutManagers array for storing view layout preferences,
+ * View select menu icon is determined by current layout preference,
+ * setUpAdapter method for setting Adapter and on click listeners
  */
 
 public class MainActivity extends Activity {
     //Private variables
     private Boolean listChanges = false;
+    private ArrayList<ArrayList<Item>> listItems = new ArrayList<>();
     //Recycler View variables
     private RecyclerView todoRecycler;
     private ToDoListAdapter todoAdapter;
-    private RecyclerView.LayoutManager todoLayoutManager;
+    private RecyclerView.LayoutManager[] todoLayoutManagers;
     //Db variables
     private ToDoListDAO dao;
     //SharedPreferences variables
     private SharedPreferences sharedPrefs;
     private boolean switchTheme;
+    private int layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         switchTheme = sharedPrefs.getBoolean("switch_theme", false);
+        layoutManager = sharedPrefs.getInt("layout_manager", 0);
         if(switchTheme){ setTheme(R.style.LightTheme); }
         else { setTheme(R.style.DarkTheme); }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Set up recycler view
         todoRecycler = findViewById(R.id.todo_recycler);
-        //Set up Layout Manager
-        todoLayoutManager = new LinearLayoutManager(this);
-        todoRecycler.setLayoutManager(todoLayoutManager);
+        //Set up Layout Managers
+        todoLayoutManagers = new RecyclerView.LayoutManager[] {
+                new LinearLayoutManager(this), //List
+                new LinearLayoutManager(this), //Details
+                new GridLayoutManager(this, 3), //Grid
+                new GridLayoutManager(this, 2) //Large grid
+        };
+        todoRecycler.setLayoutManager(todoLayoutManagers[layoutManager]);
         //Set up DAO
         dao = new ToDoListDAO(this);
         //Set up Adapter
-        todoAdapter = new ToDoListAdapter(0, dao.fetchAllNotes(), this);
-        todoRecycler.setAdapter(todoAdapter);
-        //Set up onClick listener
-        todoAdapter.setListener(new ToDoListAdapter.Listener(){
-            @Override
-            public void onClick(View view, int position){
-                Note note = todoAdapter.getNoteList().get(position);
-                Intent intent = new Intent(getApplicationContext(), ListDetailActivity.class);
-                intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, note.getId());
-                intent.putExtra("NAME", note.getName());
-                startActivityForResult(intent, 1);
-            }
-            @Override
-            public void deleteItem(View v, int position){}
-        });
+        setUpAdapter(dao.fetchAllNotes(), this);
     }
 
     @Override
@@ -116,8 +114,8 @@ public class MainActivity extends Activity {
             startActivity(getIntent());
         }
         if(listChanges){
-            todoAdapter.setNoteList(dao.fetchAllNotes());
-            todoAdapter.notifyDataSetChanged();
+            listItems.clear();
+            setUpAdapter(dao.fetchAllNotes(), this);
         }
 
     }
@@ -197,7 +195,14 @@ public class MainActivity extends Activity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
         MenuItem add_list = menu.findItem(R.id.add_list);
+        MenuItem view_select = menu.findItem(R.id.view_select);
         MenuItem app_settings = menu.findItem(R.id.app_settings);
+        int[] view_select_icons = new int[] {
+                R.drawable.ic_view_sequential_black_18dp,
+                R.drawable.ic_view_agenda_black_18dp,
+                R.drawable.ic_view_grid_black_18dp,
+                R.drawable.ic_view_large_grid_black_18dp
+        };
         if(switchTheme){ //Light Theme
             if(add_list != null){
                 add_list.setIcon(getResources().getDrawable(R.drawable.ic_add_black_18dp));
@@ -213,6 +218,7 @@ public class MainActivity extends Activity {
                 app_settings.setIcon(getResources().getDrawable(R.drawable.ic_settings_gold_18dp));
             }
         }
+        view_select.setIcon(view_select_icons[layoutManager]);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -223,25 +229,47 @@ public class MainActivity extends Activity {
         options.add(new ViewSelectOption("Details", R.drawable.ic_view_agenda_black_24dp));
         options.add(new ViewSelectOption("Grid", R.drawable.ic_view_grid_black_24dp));
         options.add(new ViewSelectOption("Large grid", R.drawable.ic_view_large_grid_black_24dp));
-
-        View viewSelectOptions = getLayoutInflater().inflate(R.layout.view_select_options, null);
-        ListView lv = viewSelectOptions.findViewById(R.id.view_options);
         ViewSelectAdapter adapter = new ViewSelectAdapter(
                 MainActivity.this,
                 options
         );
-        lv.setAdapter(adapter);
-
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle(R.string.view_select);
         builder.setAdapter(adapter, new DialogInterface.OnClickListener(){
             @Override
             public void onClick(DialogInterface dialogInterface, int position){
-                Toast.makeText(MainActivity.this, "Option selected: " + options.get(position).getOption(), Toast.LENGTH_SHORT).show();
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                editor.putInt("layout_manager", position);
+                editor.commit();
+                layoutManager = position;
+                todoRecycler.setLayoutManager(todoLayoutManagers[position]);
+                invalidateOptionsMenu();
+                setUpAdapter(todoAdapter.getNoteList(), MainActivity.this);
             }
         });
         builder.setCancelable(true);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    //Set up Adapter and OnClickListener
+    public void setUpAdapter(ArrayList<Note> list, Context context){
+        for(int i = 0; i < list.size(); i++){
+            listItems.add(dao.fetchAllItems(list.get(i).getId()));
+        }
+        todoAdapter = new ToDoListAdapter(0, list, listItems, context);
+        todoRecycler.setAdapter(todoAdapter);
+        todoAdapter.setListener(new ToDoListAdapter.Listener(){
+            @Override
+            public void onClick(View view, int position){
+                Note note = todoAdapter.getNoteList().get(position);
+                Intent intent = new Intent(getApplicationContext(), ListDetailActivity.class);
+                intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, note.getId());
+                intent.putExtra("NAME", note.getName());
+                startActivityForResult(intent, 1);
+            }
+            @Override
+            public void deleteItem(View v, int position){}
+        });
     }
 }

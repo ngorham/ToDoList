@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
  * 1.1: Added checkAllItemsDialog method, removeCheckedDialog method,
  * DeleteItemTask class
  * Replaced dialog strings with strings in strings.xml
+ * Strike through on click sets listChanges to true and displays 'Saved' Toast
  */
 
 public class ListDetailActivity extends Activity {
@@ -170,6 +171,7 @@ public class ListDetailActivity extends Activity {
                     item.setStrike(0);
                 }
                 new UpdateItemStrikeTask().execute(item);
+                listChanges = true;
             }
             @Override
             public void deleteItem(View v, int position){}
@@ -244,6 +246,9 @@ public class ListDetailActivity extends Activity {
 
     @Override
     public void onBackPressed(){
+        if(listChanges){
+            Toast.makeText(ListDetailActivity.this, "Saved", Toast.LENGTH_LONG).show();
+        }
         Intent intent = new Intent();
         intent.putExtra("changes", listChanges);
         setResult(RESULT_OK, intent);

@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -17,7 +19,11 @@ import java.util.ArrayList;
  * Purpose: Displays list of lists or list of items in a RecyclerView
  *
  * @author Neil Gorham
- * @version 1.0 03/14/2018
+ * @version 1.1 04/19/2018
+ *
+ * 1.1: Added Note view constants for setting up NoteViewHolder instances,
+ * Note view logic that determines which child views to display,
+ * listItems container for list items
  */
 
 public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -26,15 +32,21 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private Listener listener;
     private ArrayList<Item> items;
     private ArrayList<Note> notes;
+    private ArrayList<ArrayList<Item>> listItems;
     private int editType = 0;
     //SharedPreferences variables
     private SharedPreferences sharedPrefs;
     private boolean switchTheme;
+    private int layoutManager;
     //Private constants
     private final int NOTE_TYPE = 0;
     private final int ITEM_TYPE = 1;
     private final int EDIT_ITEM_TYPE = 2;
     private final int ADD_ITEM_TYPE = 3;
+    private final int NOTE_LIST_VIEW = 0;
+    private final int NOTE_DETAILS_VIEW = 1;
+    private final int NOTE_GRID_VIEW = 2;
+    private final int NOTE_LARGE_GRID_VIEW = 3;
 
     public interface Listener {
         void onClick(View view, int position);
@@ -49,9 +61,11 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     //Constructor with List<Note>
-    public ToDoListAdapter(int editType, ArrayList<Note> notes, Context context){
+    public ToDoListAdapter(int editType, ArrayList<Note> notes,
+                           ArrayList<ArrayList<Item>> listItems, Context context){
         this.context = context;
         this.notes = notes;
+        this.listItems = listItems;
         this.editType = editType;
     }
 
@@ -63,10 +77,42 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     //Configure Note type item
     private void configureNote(NoteViewHolder holder, final int position){
         Note note = notes.get(position);
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        layoutManager = sharedPrefs.getInt("layout_manager", 0);
         if(note != null){
             holder.getNameLabel().setText(note.getName());
+            if(layoutManager == NOTE_LIST_VIEW || layoutManager == NOTE_DETAILS_VIEW){
+                String lastModifiedDate = getMonthDay(note.getLastModified());
+                holder.getLastModifiedLabel().setText(lastModifiedDate);
+            }
+            if(layoutManager == NOTE_DETAILS_VIEW ||
+                    (layoutManager == NOTE_GRID_VIEW || layoutManager == NOTE_LARGE_GRID_VIEW)) {
+                for(int i = 0; i < listItems.get(position).size(); i++){
+                    Item curItem = listItems.get(position).get(i);
+                    TextView tV = new TextView(context);
+                    tV.setLayoutParams(new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    ));
+                    if(curItem.getStrike() == 1){
+                        tV.setPaintFlags(tV.getPaintFlags()
+                                | Paint.STRIKE_THRU_TEXT_FLAG);
+                    } else {
+                        tV.setPaintFlags(0);
+                    }
+                    if(i == 3 && i < listItems.get(position).size() - 1){
+                        String builder = curItem.getName() + "...";
+                        tV.setText(builder);
+                        ((LinearLayout)holder.getParent()).addView(tV);
+                        break;
+                    } else {
+                        tV.setText(curItem.getName());
+                        ((LinearLayout)holder.getParent()).addView(tV);
+                    }
+                }
+            }
         }
-        holder.getNameLabel().setOnClickListener(new View.OnClickListener(){
+        holder.getParent().setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 //If view is clicked, call onClick
@@ -200,8 +246,16 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View v;
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        layoutManager = sharedPrefs.getInt("layout_manager", 0);
+        int[] noteViews = new int[] {
+                R.layout.note_list_view,
+                R.layout.note_details_view,
+                R.layout.note_grid_view,
+                R.layout.note_grid_view
+        };
         if(viewType == NOTE_TYPE){
-            v = inflater.inflate(R.layout.note_view, parent, false);
+            v = inflater.inflate(noteViews[layoutManager], parent, false);
             return new NoteViewHolder(v);
         } else if(viewType == ITEM_TYPE){
             v = inflater.inflate(R.layout.item_view, parent, false);
