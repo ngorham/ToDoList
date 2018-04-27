@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StrikethroughSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +28,7 @@ import java.util.ArrayList;
  * Note view logic that determines which child views to display,
  * listItems container for list items,
  * itemOptions listener method for future dialog options
+ * configureNote method uses single TextView for displaying list items
  */
 
 public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -89,29 +93,32 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             if(layoutManager == NOTE_DETAILS_VIEW ||
                     (layoutManager == NOTE_GRID_VIEW || layoutManager == NOTE_LARGE_GRID_VIEW)) {
+                TextView tV = new TextView(context);
+                SpannableStringBuilder ssb = new SpannableStringBuilder();
                 for(int i = 0; i < listItems.get(position).size(); i++){
                     Item curItem = listItems.get(position).get(i);
-                    TextView tV = new TextView(context);
                     tV.setLayoutParams(new LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT
                     ));
+                    ssb.append(context.getResources().getString(R.string.sm_dot));
+                    ssb.append(curItem.getName());
                     if(curItem.getStrike() == 1){
-                        tV.setPaintFlags(tV.getPaintFlags()
-                                | Paint.STRIKE_THRU_TEXT_FLAG);
-                    } else {
-                        tV.setPaintFlags(0);
+                        ssb.setSpan(new StrikethroughSpan(),
+                                ssb.length() - curItem.getName().length(),
+                                ssb.length(),
+                                Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
                     }
                     if(i == 3 && i < listItems.get(position).size() - 1){
-                        String builder = curItem.getName() + "...";
-                        tV.setText(builder);
-                        ((LinearLayout)holder.getParent()).addView(tV);
+                        ssb.append("...");
                         break;
-                    } else {
-                        tV.setText(curItem.getName());
-                        ((LinearLayout)holder.getParent()).addView(tV);
+                    }
+                    if(i < listItems.get(position).size() - 1){
+                        ssb.append("\n");
                     }
                 }
+                tV.setText(ssb);
+                ((LinearLayout)holder.getParent()).addView(tV);
             }
         }
         holder.getParent().setOnClickListener(new View.OnClickListener(){
@@ -143,17 +150,10 @@ public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 holder.getCheckImage().setVisibility(View.GONE);
                 holder.getOptionsButton().setVisibility(View.VISIBLE);
             }
-            //SimpleDateFormat dateFormat =
-            //        new SimpleDateFormat("MMM dd", Locale.getDefault());
-            //Date date = new Date(
-            //String lastModifiedDate = getMonthDay(item.getLastModified());
-            //holder.getLastModifiedLabel().setText(lastModifiedDate);
             if(switchTheme){
                 holder.getNameLabel().setTextColor(context.getResources().getColor(R.color.textSecondaryLight));
-                //holder.getLastModifiedLabel().setTextColor(context.getResources().getColor(R.color.colorAccentLight));
             } else {
                 holder.getNameLabel().setTextColor(context.getResources().getColor(R.color.textSecondaryDark));
-                //holder.getLastModifiedLabel().setTextColor(context.getResources().getColor(R.color.colorAccentDark));
             }
         }
         holder.getParent().setOnClickListener(new View.OnClickListener(){

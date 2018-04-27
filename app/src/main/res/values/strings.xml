@@ -8,6 +8,39 @@
     <string name="check_list">Check all items</string>
     <string name="uncheck_list">Uncheck all items</string>
     <string name="remove_checked">Remove checked items</string>
+    <string name="reminder">Reminder</string>
+    <string name="type_text">Type</string>
+    <string-array name="type_spinner">
+        <item>None</item>
+        <item>Pin to status bar</item>
+        <item>Time alarm</item>
+    </string-array>
+    <string name="when_text">When</string>
+    <string name="time_text">Time</string>
+    <string-array name="months">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+    <string name="repetition_text">Repetition</string>
+    <string-array name="repetition_spinner">
+        <item>One-time event</item>
+        <item>Daily</item>
+        <item>Every weekday (Mon - Fri)</item>
+        <item>Weekly</item>
+        <item>Bi-weekly</item>
+        <item>Monthly</item>
+        <item>Yearly</item>
+    </string-array>
     <string name="text_field">Editable Text</string>
     <string name="add_item">Add Item</string>
     <string name="edit_item">Edit Item</string>
@@ -15,13 +48,17 @@
     <string name="view_select">View</string>
     <string name="more_vert">Options</string>
     <string name="check">check</string>
+    <!-- Dialogs -->
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">CANCEL</string>
     <string name="dialog_delete_list_message">"Are you sure you want to delete this list?"</string>
     <string name="dialog_check_list_message">"Are you sure you want to check all items?"</string>
     <string name="dialog_uncheck_list_message">"Are you sure you want to uncheck all items?"</string>
     <string name="dialog_remove_checked_message">"Are you sure you to remove checked items?"</string>
+    <!-- General Use -->
     <string name="empty"></string>
+    <string name="dot">\u23FA</string>
+    <string name="sm_dot">\u2022</string>
     <!-- Preferences -->
     <string name="switch_theme_title">Theme Selector</string>
     <string name="switch_theme_summary_off">Dark Theme</string>

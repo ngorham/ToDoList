@@ -17,9 +17,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ListDetailActivity" />
+        <activity android:name=".ListDetailActivity"
+            android:parentActivityName=".MainActivity" />
         <activity android:name=".ListEditActivity" />
         <activity android:name=".SettingsActivity" />
+        <receiver android:name=".NotificationPublisher" />
     </application>
 
 </manifest>
