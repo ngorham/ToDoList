@@ -38,6 +38,7 @@ import java.util.Locale;
  * View select menu icon is determined by current layout preference,
  * setUpAdapter method for setting Adapter and on click listeners,
  * setReminder boolean variable
+ * Removed DarkTheme
  */
 
 public class MainActivity extends Activity {
@@ -53,16 +54,15 @@ public class MainActivity extends Activity {
     private ToDoListDAO dao;
     //SharedPreferences variables
     private SharedPreferences sharedPrefs;
-    private boolean switchTheme;
+    //private boolean switchTheme;
     private int layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        switchTheme = sharedPrefs.getBoolean("switch_theme", false);
+        //switchTheme = sharedPrefs.getBoolean("switch_theme", false);
         layoutManager = sharedPrefs.getInt("layout_manager", 0);
-        if(switchTheme){ setTheme(R.style.LightTheme); }
-        else { setTheme(R.style.DarkTheme); }
+        setTheme(R.style.LightTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Set up recycler view
@@ -115,10 +115,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onRestart(){
         super.onRestart();
-        if(switchTheme != sharedPrefs.getBoolean("switch_theme", false)){
+        /*if(switchTheme != sharedPrefs.getBoolean("switch_theme", false)){
             finish();
             startActivity(getIntent());
-        }
+        }*/
         if(listChanges || setReminder){
             listItems.clear();
             setUpAdapter(dao.fetchAllNotes(), this);
@@ -210,21 +210,21 @@ public class MainActivity extends Activity {
                 R.drawable.ic_view_grid_black_18dp,
                 R.drawable.ic_view_large_grid_black_18dp
         };
-        if(switchTheme){ //Light Theme
+        if(true){ //Light Theme
             if(add_list != null){
                 add_list.setIcon(getResources().getDrawable(R.drawable.ic_add_black_18dp));
             }
             if(app_settings != null){
                 app_settings.setIcon(getResources().getDrawable(R.drawable.ic_settings_black_18dp));
             }
-        } else { //Dark Theme
+        } /*else { //Dark Theme
             if(add_list != null){
                 add_list.setIcon(getResources().getDrawable(R.drawable.ic_add_gold_18dp));
             }
             if(app_settings != null){
                 app_settings.setIcon(getResources().getDrawable(R.drawable.ic_settings_gold_18dp));
             }
-        }
+        }*/
         view_select.setIcon(view_select_icons[layoutManager]);
         return super.onPrepareOptionsMenu(menu);
     }

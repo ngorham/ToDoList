@@ -68,6 +68,7 @@ import java.util.Locale;
  * and displays check mark icon image
  * Check/Uncheck all items sets listChanges to true
  * Remove all checked items sets listChanges to true
+ * Removed DarkTheme
  */
 
 public class ListDetailActivity extends Activity {
@@ -96,8 +97,8 @@ public class ListDetailActivity extends Activity {
     //Db variables
     private ToDoListDAO dao;
     //SharedPreferences variables
-    private SharedPreferences sharedPrefs;
-    private boolean switchTheme;
+    //private SharedPreferences sharedPrefs;
+    //private boolean switchTheme;
     //Reminder variables
     private AlertDialog reminderAlertDialog;
     private Calendar calendar;
@@ -206,10 +207,9 @@ public class ListDetailActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         //Set SharedPreferences
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        switchTheme = sharedPrefs.getBoolean("switch_theme", false);
-        if(switchTheme){ setTheme(R.style.LightTheme); }
-        else { setTheme(R.style.DarkTheme); }
+        //sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //switchTheme = sharedPrefs.getBoolean("switch_theme", false);
+        setTheme(R.style.LightTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_detail);
         context = this;
@@ -328,10 +328,10 @@ public class ListDetailActivity extends Activity {
     @Override
     protected void onRestart(){
         super.onRestart();
-        if(switchTheme != sharedPrefs.getBoolean("switch_theme", false)){
+        /*if(switchTheme != sharedPrefs.getBoolean("switch_theme", false)){
             finish();
             startActivity(getIntent());
-        }
+        }*/
         if(listChanges){
             getActionBar().setTitle(list.getName());
             todoAdapter.setItemList(dao.fetchAllItems(list.getId()));
@@ -456,7 +456,7 @@ public class ListDetailActivity extends Activity {
         MenuItem edit_list = menu.findItem(R.id.edit_list);
         MenuItem delete_list = menu.findItem(R.id.delete_list);
         MenuItem app_settings = menu.findItem(R.id.app_settings);
-        if(switchTheme){ //Light Theme
+        if(true){ //Light Theme
             if(edit_list != null){
                 edit_list.setIcon(getResources().getDrawable(R.drawable.ic_edit_black_18dp));
             }
@@ -466,7 +466,7 @@ public class ListDetailActivity extends Activity {
             if(app_settings != null){
                 app_settings.setIcon(getResources().getDrawable(R.drawable.ic_settings_black_18dp));
             }
-        } else { //Dark Theme
+        } /*else { //Dark Theme
             if(edit_list != null){
                 edit_list.setIcon(getResources().getDrawable(R.drawable.ic_edit_gold_18dp));
             }
@@ -476,7 +476,7 @@ public class ListDetailActivity extends Activity {
             if(app_settings != null){
                 app_settings.setIcon(getResources().getDrawable(R.drawable.ic_settings_gold_18dp));
             }
-        }
+        }*/
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -765,8 +765,7 @@ public class ListDetailActivity extends Activity {
     private void deleteListDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(ListDetailActivity.this);
         builder.setTitle(R.string.delete_list);
-        if(switchTheme){ builder.setIcon(R.drawable.ic_warning_black_18dp); }
-        else { builder.setIcon(R.drawable.ic_warning_gold_18dp); }
+        builder.setIcon(R.drawable.ic_warning_black_18dp);
         builder.setMessage(R.string.dialog_delete_list_message);
         builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             @Override

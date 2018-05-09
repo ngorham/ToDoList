@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
+    <!--<PreferenceCategory
         android:title="General"
         android:key="general_category">
         <SwitchPreference
@@ -11,7 +11,7 @@
             android:summaryOn="@string/switch_theme_summary_on"
             android:switchTextOff="Dark"
             android:switchTextOn="Light" />
-    </PreferenceCategory>
+    </PreferenceCategory>-->
     <PreferenceCategory
         android:title="About"
         android:key="about_category">

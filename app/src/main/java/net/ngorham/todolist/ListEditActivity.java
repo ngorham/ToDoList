@@ -45,7 +45,7 @@ import java.util.Locale;
  *
  * 1.1: Replaced dialog strings with strings in strings.xml, intent
  * extra strings with ListDetailActivity static constants
- * Removed public static constants
+ * Removed public static constants, DarkTheme
  */
 
 public class ListEditActivity extends Activity {
@@ -70,8 +70,8 @@ public class ListEditActivity extends Activity {
     //Db variables
     private ToDoListDAO dao;
     //SharedPreferences variables
-    private SharedPreferences sharedPrefs;
-    private boolean switchTheme;
+    //private SharedPreferences sharedPrefs;
+    //private boolean switchTheme;
 
     //Inner classes
     //Update Note to db
@@ -199,10 +199,9 @@ public class ListEditActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        switchTheme = sharedPrefs.getBoolean("switch_theme", false);
-        if(switchTheme){ setTheme(R.style.LightTheme); }
-        else { setTheme(R.style.DarkTheme); }
+        //sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //switchTheme = sharedPrefs.getBoolean("switch_theme", false);
+        setTheme(R.style.LightTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_edit);
         //Set up recycler view
@@ -453,7 +452,7 @@ public class ListEditActivity extends Activity {
         MenuItem delete_list = menu.findItem(R.id.delete_list);
         MenuItem save_list = menu.findItem(R.id.save_list);
         MenuItem app_settings = menu.findItem(R.id.app_settings);
-        if(switchTheme){ //Light Theme
+        if(true){ //Light Theme
             if(delete_list != null){
                 delete_list.setIcon(getResources().getDrawable(R.drawable.ic_delete_black_18dp));
             }
@@ -463,7 +462,7 @@ public class ListEditActivity extends Activity {
             if(app_settings != null){
                 app_settings.setIcon(getResources().getDrawable(R.drawable.ic_settings_black_18dp));
             }
-        } else { //Dark Theme
+        } /*else { //Dark Theme
             if(delete_list != null){
                 delete_list.setIcon(getResources().getDrawable(R.drawable.ic_delete_gold_18dp));
             }
@@ -473,7 +472,7 @@ public class ListEditActivity extends Activity {
             if(app_settings != null){
                 app_settings.setIcon(getResources().getDrawable(R.drawable.ic_settings_gold_18dp));
             }
-        }
+        }*/
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -581,8 +580,7 @@ public class ListEditActivity extends Activity {
     private void deleteListDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(ListEditActivity.this);
         builder.setTitle(R.string.delete_list);
-        if(switchTheme){ builder.setIcon(R.drawable.ic_warning_black_18dp); }
-        else { builder.setIcon(R.drawable.ic_warning_gold_18dp); }
+        builder.setIcon(R.drawable.ic_warning_black_18dp);
         builder.setMessage(R.string.dialog_delete_list_message);
         builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             @Override
