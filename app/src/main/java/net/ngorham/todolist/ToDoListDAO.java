@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -15,7 +16,9 @@ import java.util.ArrayList;
  * Purpose: Database Access Object, provides access to local SQLiteDatabase
  *
  * @author Neil Gorham
- * @version 1.0 03/14/2018
+ * @version 1.1 05/04/2018
+ *
+ * 1.1: Added REMINDER column to NOTE table, updateReminder method
  */
 
 public class ToDoListDAO {
@@ -43,6 +46,7 @@ public class ToDoListDAO {
         values.put("NAME", note.getName());
         values.put("CREATED_ON", note.getCreatedOn());
         values.put("LAST_MODIFIED", note.getLastModified());
+        values.put("REMINDER", note.getReminder());
         //Insert into db
         try{
             long results = db.insert("NOTE", null, values);
@@ -90,6 +94,45 @@ public class ToDoListDAO {
         }
     }
 
+    //Update Note REMINDER column in db
+    public boolean updateReminder(Note note){
+        Log.d("ToDoListDAO", "INSIDE updateReminder: reminder = " + note.getReminder());
+        //Set content values
+        ContentValues values = new ContentValues();
+        values.put("REMINDER", note.getReminder());
+        values.put("REMINDER_TIME", note.getReminderTime());
+        //Update ITEM STRIKE where id matches
+        try{
+            int results = db.update("NOTE", values, "_id = ?",
+                    new String[] {String.valueOf(note.getId())});
+            return (results > 0);
+        } catch (SQLiteException e){
+            Toast.makeText(context,
+                    "Database unavailable, failed to update reminder in NOTE table",
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    //Update Note LAST_MODIFIED column in db
+    public boolean updateLastModified(Note note){
+        Log.d("ToDoListDAO", "INSIDE updateLastModified: last modified time = " + note.getLastModified());
+        //Set content values
+        ContentValues values = new ContentValues();
+        values.put("LAST_MODIFIED", note.getLastModified());
+        //Update NOTE LAST_MODIFIED where id matches
+        try{
+            int results = db.update("NOTE", values, "_id = ?",
+                    new String[] {String.valueOf(note.getId())});
+            return (results > 0);
+        } catch (SQLiteException e){
+            Toast.makeText(context,
+                    "Database unavailable, failed to update last_modified in NOTE table",
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
     //Get Note id by createdOn and lastModified times
     public int fetchNoteId(String createdOn){
         int id = 0;
@@ -129,7 +172,10 @@ public class ToDoListDAO {
                     String name = cursor.getString(1);
                     String createdOn = cursor.getString(2);
                     String lastModified = cursor.getString(3);
-                    Note note = new Note(id, name, createdOn, lastModified);
+                    int reminder = cursor.getInt(4);
+                    String reminderTime = cursor.getString(5);
+                    Log.d("ToDoListDAO", "inside fetchAllNotes: reminder = " + reminder);
+                    Note note = new Note(id, name, createdOn, lastModified, reminder, reminderTime);
                     notes.add(note);
                     cursor.moveToNext();
                 }

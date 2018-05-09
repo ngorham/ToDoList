@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     android:paddingEnd="25dp"
     android:paddingStart="25dp">
+    <Button
+        android:id="@+id/alarm_dismiss_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="alarmDismiss"
+        android:text="Dismiss"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
     <TextView
         android:id="@+id/type_text"
         android:layout_width="match_parent"
@@ -13,7 +23,7 @@
         android:text="@string/type_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/alarm_dismiss_button" />
     <Spinner
         android:id="@+id/type_spinner"
         android:layout_width="match_parent"
@@ -35,7 +45,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="alarmPresetsDialog"
-        android:text="Presets"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/when_text" />
@@ -45,7 +54,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:onClick="alarmDateDialog"
-        android:text="Date"
         app:layout_constraintEnd_toStartOf="@id/alarm_time_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/alarm_presets_button" />
@@ -55,7 +63,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="0"
         android:onClick="alarmTimeDialog"
-        android:text="Time"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/alarm_presets_button" />
     <TextView

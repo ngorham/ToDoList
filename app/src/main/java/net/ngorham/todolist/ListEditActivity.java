@@ -14,6 +14,9 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -27,6 +30,7 @@ import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -39,13 +43,12 @@ import java.util.Locale;
  * @author Neil Gorham
  * @version 1.1 04/11/2018
  *
- * 1.1: Replaced dialog strings with strings in strings.xml
+ * 1.1: Replaced dialog strings with strings in strings.xml, intent
+ * extra strings with ListDetailActivity static constants
+ * Removed public static constants
  */
 
 public class ListEditActivity extends Activity {
-    //Public constants
-    public static final String EXTRA_LIST_ID = "id";
-
     //Private variables
     private Note list = new Note();
     private boolean changes = false;
@@ -58,6 +61,8 @@ public class ListEditActivity extends Activity {
     private String oldListName;
     private ArrayList<Integer> deletedItems = new ArrayList<>();
     private ArrayList<Item> items;
+    private TextView lastModifiedTime;
+    private TextView alarmText;
     //Recycler View variables
     private RecyclerView todoRecycler;
     private ToDoListAdapter todoAdapter;
@@ -218,14 +223,18 @@ public class ListEditActivity extends Activity {
             savedCalled = savedInstanceState.getBoolean("savedCalled");
         } else { //new instance
             Bundle bundle = getIntent().getExtras();
-            if(bundle.getString("NAME") != null){ //New or existing list
-                list.setId((int)getIntent().getExtras().get(EXTRA_LIST_ID));
+            if(bundle.getString(ListDetailActivity.EXTRA_LIST_NAME) != null){ //New or existing list
+                list.setId((int)getIntent().getExtras().get(ListDetailActivity.EXTRA_LIST_ID));
                 if(list.getId() > 0) { //Edit existing list
-                    list.setName(getIntent().getStringExtra("NAME"));
-                    //DB call and close
+                    list.setName(getIntent().getStringExtra(ListDetailActivity.EXTRA_LIST_NAME));
+                    list.setLastModified(getIntent().getStringExtra(ListDetailActivity.EXTRA_LIST_LAST_MODIFIED));
+                    list.setReminder(getIntent().getIntExtra(ListDetailActivity.EXTRA_LIST_REMINDER, 0));
+                    list.setReminderTime(getIntent().getStringExtra(ListDetailActivity.EXTRA_LIST_REMINDER_TIME));
+                    //DB call
                     items = dao.fetchAllItems(list.getId());
                 } else { //Create new list
                     items = new ArrayList<>();
+                    list.setLastModified(getDateTime());
                 }
                 //Add AddItem options to top and bottom of recyclerView
                 Item front = new Item();
@@ -302,6 +311,17 @@ public class ListEditActivity extends Activity {
             }
         });
         actionBar.setDisplayOptions(actionBar.DISPLAY_SHOW_CUSTOM);
+        //Set up last modified/alarm time textview
+        lastModifiedTime = findViewById(R.id.last_modified_time);
+        alarmText = findViewById(R.id.alarm_text);
+        lastModifiedTime.setText(getResources().getString(R.string.editing));
+        if(list.getReminder() == 1){ //pin icon
+            alarmText.setText(addIcon(R.drawable.ic_pin_black_18dp, list.getReminderTime()));
+        } else if(list.getReminder() == 2){ //clock icon
+            alarmText.setText(addIcon(R.drawable.ic_clock_outline_black_18dp, list.getReminderTime()));
+        } else {
+            alarmText.setText(getDateTimeString(list.getLastModified()));
+        }
     }
 
     @Override
@@ -341,7 +361,8 @@ public class ListEditActivity extends Activity {
         Intent intent = new Intent();
         if(!savedCalled){ intent.putExtra("changes", updateDB()); }
         else { intent.putExtra("changes", savedCalled); }
-        intent.putExtra("NAME", list.getName());
+        intent.putExtra(ListDetailActivity.EXTRA_LIST_NAME, list.getName());
+        intent.putExtra(ListDetailActivity.EXTRA_LIST_LAST_MODIFIED, list.getLastModified());
         setResult(RESULT_OK, intent);
         super.onBackPressed();
     }
@@ -588,6 +609,7 @@ public class ListEditActivity extends Activity {
         alertDialog.show();
     }
 
+    //Utilities
     //Utility that creates a string of the current date and time
     public String getDateTime(){
         SimpleDateFormat dateFormat = new SimpleDateFormat(
@@ -602,6 +624,56 @@ public class ListEditActivity extends Activity {
                 "MM-dd-yyyy", Locale.getDefault());
         Date date = new Date();
         return "(" + dateFormat.format(date) + ")";
+    }
+
+    //Utility for displaying Month and Day of list's lastModified
+    private String getMonthDayString(String date){
+        String month = "";
+        String monthSubstr = date.substring(5, 7);
+        String day = date.substring(8, 10);
+        if(monthSubstr.equals("01")){
+            month = "Jan";
+        } else if(monthSubstr.equals("02")){
+            month = "Feb";
+        } else if(monthSubstr.equals("03")){
+            month = "Mar";
+        } else if(monthSubstr.equals("04")){
+            month = "Apr";
+        } else if(monthSubstr.equals("05")){
+            month = "May";
+        } else if(monthSubstr.equals("06")){
+            month = "Jun";
+        } else if(monthSubstr.equals("07")){
+            month = "Jul";
+        } else if(monthSubstr.equals("08")){
+            month = "Aug";
+        } else if(monthSubstr.equals("09")){
+            month = "Sep";
+        } else if(monthSubstr.equals("10")){
+            month = "Oct";
+        } else if(monthSubstr.equals("11")){
+            month = "Nov";
+        } else if(monthSubstr.equals("12")){
+            month = "Dec";
+        }
+        return (month + " " + day);
+    }
+
+    //Utility for displaying date and time of list's lastModified
+    private String getDateTimeString(String date){
+        String year = date.substring(2, 4);
+        String month = date.substring(5, 7);
+        String day = date.substring(8, 10);
+        String time = date.substring(11, 16);
+        StringBuilder sb = new StringBuilder();
+        sb.append(month);
+        sb.append("/");
+        sb.append(day);
+        sb.append("/");
+        sb.append(year);
+        sb.append(" ");
+        sb.append(time);
+        return sb.toString();
     }
 
     //Updates db if changes are made
@@ -702,5 +774,17 @@ public class ListEditActivity extends Activity {
         b.putBoolean("listNameChange", listNameChange);
         b.putBoolean("savedCalled", savedCalled);
         return b;
+    }
+
+    //Utility for adding an icon to a string
+    private SpannableStringBuilder addIcon(int iconId, String text){
+        SpannableStringBuilder ssb = new SpannableStringBuilder();
+        ssb.append("icon");
+        Drawable d = getResources().getDrawable(iconId);
+        d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+        ImageSpan span = new ImageSpan(d);
+        ssb.setSpan(span, 0 , 4, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        ssb.append(text);
+        return ssb;
     }
 }

@@ -8,6 +8,8 @@
     <string name="check_list">Check all items</string>
     <string name="uncheck_list">Uncheck all items</string>
     <string name="remove_checked">Remove checked items</string>
+    <string name="editing">Editing</string>
+    <!-- Reminder -->
     <string name="reminder">Reminder</string>
     <string name="type_text">Type</string>
     <string-array name="type_spinner">
@@ -41,6 +43,8 @@
         <item>Monthly</item>
         <item>Yearly</item>
     </string-array>
+    <string name="preset">In 15 minutes</string>
+    <!-- List Items -->
     <string name="text_field">Editable Text</string>
     <string name="add_item">Add Item</string>
     <string name="edit_item">Edit Item</string>

@@ -18,7 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * To Do List
@@ -32,12 +36,14 @@ import java.util.ArrayList;
  * 1.1: Added viewSelectDialog for selecting view layout preference,
  * todoLayoutManagers array for storing view layout preferences,
  * View select menu icon is determined by current layout preference,
- * setUpAdapter method for setting Adapter and on click listeners
+ * setUpAdapter method for setting Adapter and on click listeners,
+ * setReminder boolean variable
  */
 
 public class MainActivity extends Activity {
     //Private variables
     private Boolean listChanges = false;
+    private Boolean setReminder = false;
     private ArrayList<ArrayList<Item>> listItems = new ArrayList<>();
     //Recycler View variables
     private RecyclerView todoRecycler;
@@ -113,7 +119,7 @@ public class MainActivity extends Activity {
             finish();
             startActivity(getIntent());
         }
-        if(listChanges){
+        if(listChanges || setReminder){
             listItems.clear();
             setUpAdapter(dao.fetchAllNotes(), this);
         }
@@ -126,6 +132,7 @@ public class MainActivity extends Activity {
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
                 listChanges = data.getExtras().getBoolean("changes");
+                setReminder = data.getExtras().getBoolean("setReminder");
             }
         } else if(requestCode == 2){
             finish();
@@ -175,8 +182,8 @@ public class MainActivity extends Activity {
         switch(item.getItemId()){ //Handle action items
             case R.id.add_list: //Add list action
                 intent = new Intent(this, ListEditActivity.class);
-                intent.putExtra(ListEditActivity.EXTRA_LIST_ID, 0);
-                intent.putExtra("NAME", "");
+                intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, 0);
+                intent.putExtra(ListDetailActivity.EXTRA_LIST_NAME, "");
                 startActivityForResult(intent, 1);
                 return true;
             case R.id.view_select: //View select action
@@ -265,7 +272,10 @@ public class MainActivity extends Activity {
                 Note note = todoAdapter.getNoteList().get(position);
                 Intent intent = new Intent(getApplicationContext(), ListDetailActivity.class);
                 intent.putExtra(ListDetailActivity.EXTRA_LIST_ID, note.getId());
-                intent.putExtra("NAME", note.getName());
+                intent.putExtra(ListDetailActivity.EXTRA_LIST_NAME, note.getName());
+                intent.putExtra(ListDetailActivity.EXTRA_LIST_LAST_MODIFIED, note.getLastModified());
+                intent.putExtra(ListDetailActivity.EXTRA_LIST_REMINDER, note.getReminder());
+                intent.putExtra(ListDetailActivity.EXTRA_LIST_REMINDER_TIME, note.getReminderTime());
                 startActivityForResult(intent, 1);
             }
             @Override
