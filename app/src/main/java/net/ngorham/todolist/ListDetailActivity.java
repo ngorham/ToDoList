@@ -272,8 +272,8 @@ public class ListDetailActivity extends Activity {
             public void deleteItem(View v, int position){}
             @Override
             public void itemOptions(View v, int position){
-                //Toast.makeText(ListDetailActivity.this, "Item Options selected, position = " + position, Toast.LENGTH_SHORT).show();
-                //itemOptionsDialog();
+                Item item = todoAdapter.getItemList().get(position);
+                itemOptionsDialog(item);
             }
         });
         //Add divider item decoration
@@ -843,7 +843,7 @@ public class ListDetailActivity extends Activity {
     }
 
     //Display Remove checked items AlertDialog
-    private void removeCheckedDialog() {
+    private void removeCheckedDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(ListDetailActivity.this);
         builder.setTitle(R.string.remove_checked);
         builder.setIcon(R.drawable.ic_close_black_18dp);
@@ -872,6 +872,26 @@ public class ListDetailActivity extends Activity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //cancel
+            }
+        });
+        builder.setCancelable(true);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    //Display Item options AlertDialog
+    private void itemOptionsDialog(Item item){
+        final ArrayList<String> options = new ArrayList<>();
+        ArrayAdapter adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, options);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListDetailActivity.this);
+        builder.setTitle(item.getName());
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int position) {
+                //Edit Item
+                //Web Search
+                //Copy to Clipboard
             }
         });
         builder.setCancelable(true);
